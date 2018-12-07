@@ -1,6 +1,6 @@
 # Using computer vision to detect if bike lanes are blocked
 
-Hi! If you understand deep learning and would like to collaborate, feel free to skip to the "Challenges" section.
+Hi! If you understand deep learning and would like to collaborate, feel free to jump over to my the [working notebook](https://github.com/bfraiche/parkingdirty/blob/master/parking_dirty.ipynb)
 
 ### Problem
 Per the [website](http://parkingdirty.com "Parking Dirty"), Parking Dirty is a project to crowd-source data on Arlington, VA's frequently-blocked bike lanes.
@@ -29,15 +29,9 @@ I have had success using Keras, which is a deep learning framework that lives on
 
 Python will be the easiest to collaborate / configure in a cloud service. (However, I prefer using R, which has a Keras library).
 
-### Challenges
-[As noted in this Keras tutorial](http://manning-content.s3.amazonaws.com/download/9/9a3b0d8-e651-4239-8c4f-94267be64fee/SampleCh03.pdf "RKeras"), training a new image classification model requires a lot of compute power. This means I need to use a cloud service with a GPU or TPU kernel
+### Cloud Service Tools
+I am using [Google Colab](https://colab.research.google.com/notebooks/gpu.ipynb) which provides a [notebook](https://medium.com/netflix-techblog/notebook-innovation-591ee3221233) interface with access to GPU or TPUs. This is just free and didn't require help setting up.
 
-*HERE IS WHERE I NEED HELP*
+[As noted in this Keras tutorial](http://manning-content.s3.amazonaws.com/download/9/9a3b0d8-e651-4239-8c4f-94267be64fee/SampleCh03.pdf "RKeras"), training a _new_ image classification model requires a lot of compute power i.e. a GPU or TPU kernel.
 
-I have not been able to figure out a place to train this model (which will also require me to store the image files).
-
-[There are many deep learning cloud services](https://towardsdatascience.com/maximize-your-gpu-dollars-a9133f4e546a "GPUs"). I don't have a preference. I can spend *some* money but not more than $20-$30. I am thinking [GCP](https://cloud.google.com/solutions/running-distributed-tensorflow-on-compute-engine "GCP") or [AWS](https://aws.amazon.com/sagemaker/ "AWS").
-
-[TensorFlow Hub might also provide something akin to this](https://www.tensorflow.org/hub/ "TFHub").
-
-Can you setup a workspace on a deep learning cloud service?
+[There are many deep learning cloud services](https://towardsdatascience.com/maximize-your-gpu-dollars-a9133f4e546a "GPUs"). I don't have a preference. I could spend *some* money but not more than $20-$30. This would be the case for [GCP](https://cloud.google.com/solutions/running-distributed-tensorflow-on-compute-engine "GCP") or [AWS](https://aws.amazon.com/sagemaker/ "AWS"). [TensorFlow Hub might also provide something akin to this](https://www.tensorflow.org/hub/ "TFHub").
