@@ -6,7 +6,9 @@ Hi! If you understand deep learning and would like to collaborate, feel free to 
 **UPDATE** (2019.01.11):
 Hello, [Bike Hack Night Techies](https://www.meetup.com/Transportation-Techies/events/256991003/)!
 
-For prospective collaborators, [I have created a punch-list of high-level goals](https://www.evernote.com/shard/s338/sh/3ea3e7e7-fec7-4b15-aeca-1f8462192c84/5a37a8fb0a86ddf1a5accd32dd8c3b18 "Evernote Doc") for to make this project more complete 
+For prospective collaborators, [I have created a punch-list of high-level goals](https://www.evernote.com/shard/s338/sh/3ea3e7e7-fec7-4b15-aeca-1f8462192c84/5a37a8fb0a86ddf1a5accd32dd8c3b18 "Evernote Doc")  that will make this project more complete
+
+Please fork this repo and open a PRs, etc
 
 You can find the [slides from my presentation here](bit.ly/predictingdirty "Predicting Dirty")
 
