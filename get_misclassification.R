@@ -10,7 +10,9 @@ col_names <- c('image','obstacle_10%',
                'obstacle_40%','obstacle_45%',
                'obstacle_50%', 'obstacle_centerPoint','obstacle_bikes','label')
 
-raw <- read_csv(commandArgs(trailingOnly = TRUE)[1],
+args <- commandArgs(trailingOnly = TRUE)
+
+raw <- read_csv(args[1],
                 col_names = col_names)
 
 output <- 
@@ -19,7 +21,7 @@ output <-
   mutate(value = if_else(value >= 1, 1, 0)) %>% 
   mutate(match = if_else(label == value, 1, 0)) %>% 
   filter(match == 0) %>% 
-  slice(commandArgs(trailingOnly = TRUE)[2])
+  slice(1:args[2])
 
 print(output)
 
