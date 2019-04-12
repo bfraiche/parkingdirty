@@ -302,7 +302,7 @@ def get_misclassification(file, n):
 
 """piece of code that represent the concrete detection, calling the TF session"""
 
-def processimages(detection_graph, path_images_dir, save_directory, threshold, n):
+def processimages(detection_graph, path_images_dir, save_directory, threshold, n, lane_poly):
   
   csv_file = 'object_detection/output_csv/csvfile.csv'
 
@@ -334,7 +334,7 @@ def processimages(detection_graph, path_images_dir, save_directory, threshold, n
         # it could change if the camera's perspective is changed
         # a more robust solution would automatically identify bike lanes
         # lane points identified with: https://www.image-map.net/
-        lane = np.array([[158,278],[126,272],[302,115],[310,116]])
+        lane = np.array(lane_poly)
         pathbikelane = mpltPath.Path(lane)
 
   # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
