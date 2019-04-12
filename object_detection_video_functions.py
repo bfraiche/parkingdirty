@@ -135,6 +135,9 @@ def process_frames(image_np_expanded, w, h, sess, detection_boxes, detection_sco
 
 
 def set_up_detection(sess, detection_graph):
+  
+  sess = tf.Session(graph=detection_graph)
+
   sess.run(tf.global_variables_initializer())
   # Definite input and output Tensors for detection_graph
   image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
