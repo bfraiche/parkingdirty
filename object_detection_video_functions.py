@@ -78,7 +78,7 @@ def visualize_boxes(image, box_val, class_val, score_val, threshold):
 
 """piece of code that represent the concrete detection, calling the TF session"""
 
-def process_frames(image_np_expanded, w, h, sess, detection_boxes, detection_scores, detection_classes, num_detections, blocked, ind, threshold, lane_poly):
+def process_frames(image_tensor, image_np_expanded, w, h, sess, detection_boxes, detection_scores, detection_classes, num_detections, blocked, ind, threshold, lane_poly):
   for i in image_np_expanded:   
   # Actual detection.
     (boxes, scores, classes, num) = sess.run(
@@ -134,11 +134,10 @@ def process_frames(image_np_expanded, w, h, sess, detection_boxes, detection_sco
   return boxes, classes, scores, num, blocked, ind, blocked_text
 
 
-def set_up_detection(detection_graph):
+def set_up_detection(sess, detection_graph):
   
-  sess = tf.Session(graph=detection_graph)
-
   sess.run(tf.global_variables_initializer())
+
   # Definite input and output Tensors for detection_graph
   image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
   # Each box represents a part of the image where a particular object was detected.
@@ -190,7 +189,7 @@ def process_video(video_file, detection_graph, threshold, lane_poly):
         image_np_expanded = np.expand_dims(image_np, axis=0)
 
 
-        boxes, classes, scores, num, blocked, ind, blocked_text = process_frames(image_np_expanded, w, h, sess, detection_boxes, detection_scores, detection_classes, num_detections, blocked, ind, threshold, lane_poly)        
+        boxes, classes, scores, num, blocked, ind, blocked_text = process_frames(image_tensor, image_np_expanded, w, h, sess, detection_boxes, detection_scores, detection_classes, num_detections, blocked, ind, threshold, lane_poly)        
 
         #print(blocked)
 
