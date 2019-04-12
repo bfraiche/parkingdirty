@@ -134,6 +134,19 @@ def process_frames(image_np_expanded, w, h, sess, detection_boxes, detection_sco
   return boxes, classes, scores, num, blocked, ind, blocked_text
 
 
+def set_up_detection(sess, detection_graph):
+  sess.run(tf.global_variables_initializer())
+  # Definite input and output Tensors for detection_graph
+  image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
+  # Each box represents a part of the image where a particular object was detected.
+  detection_boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
+  # score: confidence in the class prediction
+  detection_scores = detection_graph.get_tensor_by_name('detection_scores:0')
+  # detected class
+  detection_classes = detection_graph.get_tensor_by_name('detection_classes:0')
+  num_detections = detection_graph.get_tensor_by_name('num_detections:0')
+  
+  return image_tensor, detection_boxes, detection_scores, detection_classes, num_detections
 
 def process_video(video_file, detection_graph, threshold, lane_poly):
   
