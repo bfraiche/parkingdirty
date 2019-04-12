@@ -134,7 +134,7 @@ def process_frames(image_np_expanded, w, h, sess, detection_boxes, detection_sco
   return boxes, classes, scores, num, blocked, ind, blocked_text
 
 
-def set_up_detection(sess, detection_graph):
+def set_up_detection(detection_graph):
   
   sess = tf.Session(graph=detection_graph)
 
