@@ -178,7 +178,7 @@ def process_video(video_file, detection_graph, threshold, lane_poly):
   with detection_graph.as_default():
     with tf.Session(graph=detection_graph) as sess:
 
-      image_tensor, detection_boxes, detection_scores, detection_classes, num_detections = set_up_detection(sess, detection_graph)
+      image_tensor, detection_boxes, detection_scores, detection_classes, num_detections = set_up_detection(detection_graph)
 
       # configure tf object detection API for boxes, scores, classes, and num of detections
       while(cap.isOpened()):
