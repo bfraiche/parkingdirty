@@ -213,3 +213,31 @@ def process_video(video_file, detection_graph, threshold, lane_poly):
 
   print('successfully run')
   cv2.destroyAllWindows()
+  
+  
+  
+def get_first_frame(video_file):
+ # video_file = 'out-2.avi'  
+
+  try:
+    cap = cv2.VideoCapture(video_file)
+    print(video_file + " successfully loaded")
+  except IOError:
+    print("Issue opening "+video_file)
+
+
+  print('starting processing')
+
+
+  # configure tf object detection API for boxes, scores, classes, and num of detections
+  while(cap.isOpened()):
+    ret, image_np = cap.read()
+
+    image_np_expanded = np.expand_dims(image_np, axis=0)
+    
+    imageio.imwrite('first-frame.jpg', image_np_expanded[0])
+    
+    print('first frame written out')
+
+
+    break
