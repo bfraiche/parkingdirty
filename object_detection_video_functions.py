@@ -131,7 +131,7 @@ def process_frames(image_tensor, image_np_expanded, w, h, sess, detection_boxes,
     
     print(blocked, ind)
   
-  return boxes, classes, scores, num, blocked, ind, blocked_text
+  return boxes, classes, scores, num, blocked, ind, blocked_text, lane
 
 
 def set_up_detection(sess, detection_graph):
@@ -189,7 +189,7 @@ def process_video(video_file, detection_graph, threshold, lane_poly):
         image_np_expanded = np.expand_dims(image_np, axis=0)
 
 
-        boxes, classes, scores, num, blocked, ind, blocked_text = process_frames(image_tensor, image_np_expanded, w, h, sess, detection_boxes, detection_scores, detection_classes, num_detections, blocked, ind, threshold, lane_poly)        
+        boxes, classes, scores, num, blocked, ind, blocked_text, lane = process_frames(image_tensor, image_np_expanded, w, h, sess, detection_boxes, detection_scores, detection_classes, num_detections, blocked, ind, threshold, lane_poly)        
 
         #print(blocked)
 
@@ -199,6 +199,7 @@ def process_video(video_file, detection_graph, threshold, lane_poly):
         img = image_np.copy()
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(img, 'blocked' + str(blocked_text) + '% of the time',(10,500), font, 1,(255,255,255),2,cv2.LINE_AA)
+        cv2.polylines(img, lane,True,(0,255,255))
 
         # write out video with object labels
         if ret==True:
