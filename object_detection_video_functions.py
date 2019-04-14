@@ -64,8 +64,6 @@ def get_car_boxes(boxes, class_ids):
   
   
 def visualize_boxes(image, box_val, class_val, score_val, threshold):
-  
-  score_val = re.sub("[^0-9]", "", score_val.decode('utf-8'))
   vis_util.visualize_boxes_and_labels_on_image_array(
    image,
    np.squeeze(box_val),
