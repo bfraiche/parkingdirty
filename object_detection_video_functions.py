@@ -181,7 +181,7 @@ def process_video(video_file, detection_graph, threshold, lane_poly):
 
       # configure tf object detection API for boxes, scores, classes, and num of detections
       while(cap.isOpened()):
-        ret, image_np = cap.read)
+        ret, image_np = cap.read()
 
         if not ret:
           break
