@@ -64,16 +64,20 @@ if not os.path.exists('object_detection/output_xml'):
 
 """**Configuration** of the model to use, path to the frozen inference graph and extra config elements for the Object detection API implementation."""
 
-def download_data():
-# download and read in data
-  zip_address = 'http://parkingdirty.com/BlockedBikeLaneTrainingSingleCam.zip'
-
-  import requests, zipfile, io
-  r = requests.get(zip_address)
-  z = zipfile.ZipFile(io.BytesIO(r.content))
-  z.extractall('object_detection/input_imgs') # extract images from zip to input_imgs folder
+def download_data(cam):
+  if cam == "single":
   
-  print('data downloaded successfully')
+# download and read in data
+    zip_address = 'http://parkingdirty.com/BlockedBikeLaneTrainingSingleCam.zip'
+  else:
+    zip_address = 'http://parkingdirty.com/BlockedBikeLaneTrainingFull.zip'
+  
+    import requests, zipfile, io
+    r = requests.get(zip_address)
+    z = zipfile.ZipFile(io.BytesIO(r.content))
+    z.extractall('object_detection/input_imgs') # extract images from zip to input_imgs folder
+    
+    print('data downloaded successfully')
 
 
 # model download process
@@ -316,39 +320,63 @@ def processimages(detection_graph, path_images_dir, save_directory, threshold, n
     with tf.Session(graph=detection_graph) as sess:
       
       # configure tf object detection API for boxes, scores, classes, and num of detections
-      
       image_tensor, detection_boxes, detection_scores, detection_classes, num_detections = set_up_detection(sess, detection_graph)
-      
-      # loop through the object detection algorithm for each image
-      
-      
-      # used this path join in the for loop to get both the 'blocked' and 'notblocked' folders
-      for image_path in [os.path.join(path, name) for path, subdirs, files in os.walk(path_images_dir) for name in files[:n]]:
-#       for image_path in [os.path.join(path, name) for path, subdirs, files in os.walk(path_images_dir) for name in files:
-       
-        timestamp, img_name, img_labels, boxes, scores, classes, num = analyze_image(image_path, path_images_dir, sess, image_tensor, detection_boxes, detection_scores, detection_classes, num_detections)        
         
-        num_cars_in_bikelane_01, num_cars_in_bikelane_015, num_cars_in_bikelane_02, num_cars_in_bikelane_025, num_cars_in_bikelane_03, num_cars_in_bikelane_035, num_cars_in_bikelane_04, num_cars_in_bikelane_045, num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, num_bikes_in_bike_lane = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0        
+        # loop through the object detection algorithm for each image
+        
+      if n == 'all':  
+        # used this path join in the for loop to get both the 'blocked' and 'notblocked' folders
+        for image_path in [os.path.join(path, name) for path, subdirs, files in os.walk(path_images_dir) for name in files]:
+  #       for image_path in [os.path.join(path, name) for path, subdirs, files in os.walk(path_images_dir) for name in files:
+         
+          timestamp, img_name, img_labels, boxes, scores, classes, num = analyze_image(image_path, path_images_dir, sess, image_tensor, detection_boxes, detection_scores, detection_classes, num_detections)        
+          
+          num_cars_in_bikelane_01, num_cars_in_bikelane_015, num_cars_in_bikelane_02, num_cars_in_bikelane_025, num_cars_in_bikelane_03, num_cars_in_bikelane_035, num_cars_in_bikelane_04, num_cars_in_bikelane_045, num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, num_bikes_in_bike_lane = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0        
+  
+          # the lane polygon is specific to each camera at a particular point in time
+          # it could change if the camera's perspective is changed
+          # a more robust solution would automatically identify bike lanes
+          # lane points identified with: https://www.image-map.net/
+          lane = np.array(lane_poly)
+          pathbikelane = mpltPath.Path(lane)
+  
+    # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
+    #      writer = Writer(image_path, width, height)
+  
+          analyze_boxes(boxes, scores, classes, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+          num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
+          num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
+          num_cars_in_bikelane_04, num_cars_in_bikelane_045,
+          num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, 
+          num_bikes_in_bike_lane)
+      else:  
+        # used this path join in the for loop to get both the 'blocked' and 'notblocked' folders
+        for image_path in [os.path.join(path, name) for path, subdirs, files in os.walk(path_images_dir) for name in files[:n]]:
+  #       for image_path in [os.path.join(path, name) for path, subdirs, files in os.walk(path_images_dir) for name in files:
+         
+          timestamp, img_name, img_labels, boxes, scores, classes, num = analyze_image(image_path, path_images_dir, sess, image_tensor, detection_boxes, detection_scores, detection_classes, num_detections)        
+          
+          num_cars_in_bikelane_01, num_cars_in_bikelane_015, num_cars_in_bikelane_02, num_cars_in_bikelane_025, num_cars_in_bikelane_03, num_cars_in_bikelane_035, num_cars_in_bikelane_04, num_cars_in_bikelane_045, num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, num_bikes_in_bike_lane = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0        
+  
+          # the lane polygon is specific to each camera at a particular point in time
+          # it could change if the camera's perspective is changed
+          # a more robust solution would automatically identify bike lanes
+          # lane points identified with: https://www.image-map.net/
+          lane = np.array(lane_poly)
+          pathbikelane = mpltPath.Path(lane)
+  
+    # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
+    #      writer = Writer(image_path, width, height)
+  
+          analyze_boxes(boxes, scores, classes, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+          num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
+          num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
+          num_cars_in_bikelane_04, num_cars_in_bikelane_045,
+          num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, 
+          num_bikes_in_bike_lane)
 
-        # the lane polygon is specific to each camera at a particular point in time
-        # it could change if the camera's perspective is changed
-        # a more robust solution would automatically identify bike lanes
-        # lane points identified with: https://www.image-map.net/
-        lane = np.array(lane_poly)
-        pathbikelane = mpltPath.Path(lane)
-
-  # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
-  #      writer = Writer(image_path, width, height)
-
-        analyze_boxes(boxes, scores, classes, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
-        num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
-        num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
-        num_cars_in_bikelane_04, num_cars_in_bikelane_045,
-        num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, 
-        num_bikes_in_bike_lane)
-
-        #print("Process Time " + str(time.time() - start_time))
-        #scipy.misc.imsave('object_detection/output_imgs/' + os.path.split(image_path)[1], image_np) # save csv to a different directory than annotated images
+          #print("Process Time " + str(time.time() - start_time))
+          #scipy.misc.imsave('object_detection/output_imgs/' + os.path.split(image_path)[1], image_np) # save csv to a different directory than annotated images
         
   f.close()
   print('successfully run')
