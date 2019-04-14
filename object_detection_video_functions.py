@@ -26,7 +26,6 @@ import datetime
 import cv2
 import subprocess
 import shutil
-import matplotlib.path as mpltPath
 
 from google.colab.patches import cv2_imshow 
 
@@ -240,6 +239,8 @@ def get_first_frame(video_file):
     image_np_expanded = np.expand_dims(image_np, axis=0)
     
     imageio.imwrite('first-frame.jpg', image_np_expanded[0])
+    
+    return image_np_expanded[0]
     
     print('first frame written out')
 
