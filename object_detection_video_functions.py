@@ -68,7 +68,7 @@ def visualize_boxes(image, box_val, class_val, score_val, threshold):
    image,
    np.squeeze(box_val),
    np.squeeze(class_val).astype(np.int32),
-   np.squeeze(score_val).decode('utf8'),
+   np.squeeze(score_val.decode('utf8')),
    category_index,
    min_score_thresh=threshold,
    use_normalized_coordinates=True,
