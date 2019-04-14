@@ -68,7 +68,7 @@ def visualize_boxes(image, box_val, class_val, score_val, threshold):
    image,
    np.squeeze(box_val),
    np.squeeze(class_val).astype(np.int32),
-   np.squeeze(score_val),
+   np.squeeze(score_val).astype(np.int32),
    category_index,
    min_score_thresh=threshold,
    use_normalized_coordinates=True,
@@ -125,7 +125,7 @@ def process_frames(image_tensor, image_np_expanded, w, h, sess, detection_boxes,
       
     ind += 1
 
-    blocked_text = str(round(100 * blocked / ind, 0))
+    blocked_text = round(100 * blocked / ind, 0)
     
     print(blocked, ind)
   
@@ -205,7 +205,7 @@ def process_video(video_file, detection_graph, threshold, lane_poly):
 
         print(blocked_text)
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame_out, 'blocked' + str(blocked_text) + '% of the time',(10,500), font, 1,(255,255,255),2,cv2.LINE_AA)
+        cv2.putText(frame_out, 'blocked ' + str(blocked_text) + '% of the time',(10,500), font, 1,(255,255,255),2,cv2.LINE_AA)
         
   #      pathbikelane = mpltPath.Path(lane)
   #      cv2.polylines(img, pathbikelane,True,(0,255,255))
