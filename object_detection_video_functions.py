@@ -181,7 +181,7 @@ def process_video(video_file, detection_graph, threshold, lane_poly):
 
       # configure tf object detection API for boxes, scores, classes, and num of detections
       while(cap.isOpened()):
-        ret, image_np = cap.read()
+        ret, image_np = cap.read)
 
         if not ret:
           break
@@ -199,7 +199,10 @@ def process_video(video_file, detection_graph, threshold, lane_poly):
         img = image_np.copy()
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(img, 'blocked' + str(blocked_text) + '% of the time',(10,500), font, 1,(255,255,255),2,cv2.LINE_AA)
-        cv2.polylines(img, np.int32(lane_poly),True,(0,255,255))
+        
+        lane = np.array(lane_poly)
+        pathbikelane = mpltPath.Path(lane)
+        cv2.polylines(img, pathbikelane,True,(0,255,255))
 
         # write out video with object labels
         if ret==True:
