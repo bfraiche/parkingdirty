@@ -194,7 +194,7 @@ def process_video(video_file, detection_graph, threshold, lane_poly):
 
         visualize_boxes(image_np, boxes, classes, scores, threshold)
 
-        lane = np.array(lane_poly, np.int32)
+        lane = np.array([lane_poly], np.int32)
 
   #      img = image_np.copy()
         overlay = image_np.copy()
