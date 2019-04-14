@@ -203,9 +203,9 @@ def process_video(video_file, detection_graph, threshold, lane_poly):
         src2 = cv2.fillPoly(image_np, lane, (255, 255, 0))
         frame_out = cv2.addWeighted(overlay, alpha, src2, beta, 0, image_np);
 
-        blocked_text = unicodedata.normalize('NFKD', blocked_text).encode('ascii','ignore')
+        blocked_text = unicodedata.normalize('NFKD', str(blocked_text)).encode('ascii','ignore')
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame_out, 'blocked' + str(blocked_text) + '% of the time',(10,500), font, 1,(255,255,255),2,cv2.LINE_AA)
+        cv2.putText(frame_out, 'blocked' + blocked_text + '% of the time',(10,500), font, 1,(255,255,255),2,cv2.LINE_AA)
         
   #      pathbikelane = mpltPath.Path(lane)
   #      cv2.polylines(img, pathbikelane,True,(0,255,255))
