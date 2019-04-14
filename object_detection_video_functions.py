@@ -64,11 +64,13 @@ def get_car_boxes(boxes, class_ids):
   
   
 def visualize_boxes(image, box_val, class_val, score_val, threshold):
+  
+  score_val = re.sub("[^0-9", "", score_val)
   vis_util.visualize_boxes_and_labels_on_image_array(
    image,
    np.squeeze(box_val),
    np.squeeze(class_val).astype(np.int32),
-   np.squeeze(re.sub("[^0-9", "", score_val)),
+   np.squeeze(score_val),
    category_index,
    min_score_thresh=threshold,
    use_normalized_coordinates=True,
