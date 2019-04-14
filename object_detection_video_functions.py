@@ -11,7 +11,6 @@ from io import StringIO
 from matplotlib import pyplot as plt
 import matplotlib.path as mpltPath
 
-
 from PIL import Image
 import scipy.misc
 
@@ -28,10 +27,10 @@ import subprocess
 import shutil
 
 from google.colab.patches import cv2_imshow 
+import unicodedata
 
-from PIL import ImageOps
 import imageio
-from PIL import ImageFont, ImageDraw, Image
+from PIL import ImageFont, ImageDraw, Image,ImageOps
 
 
 import subprocess # for running R script in python
@@ -204,6 +203,7 @@ def process_video(video_file, detection_graph, threshold, lane_poly):
         src2 = cv2.fillPoly(image_np, lane, (255, 255, 0))
         frame_out = cv2.addWeighted(overlay, alpha, src2, beta, 0, image_np);
 
+        blocked_text = unicodedata.normalize('NFKD', blocked_text).encode('ascii','ignore')
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frame_out, 'blocked' + str(blocked_text) + '% of the time',(10,500), font, 1,(255,255,255),2,cv2.LINE_AA)
         
