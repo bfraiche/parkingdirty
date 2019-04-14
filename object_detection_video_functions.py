@@ -27,7 +27,7 @@ import subprocess
 import shutil
 
 from google.colab.patches import cv2_imshow 
-import unicodedata
+import re
 
 import imageio
 from PIL import ImageFont, ImageDraw, Image,ImageOps
@@ -68,7 +68,7 @@ def visualize_boxes(image, box_val, class_val, score_val, threshold):
    image,
    np.squeeze(box_val),
    np.squeeze(class_val).astype(np.int32),
-   np.squeeze(score_val.decode('utf8')),
+   np.squeeze(re.sub("[^0-9", "", score_val)),
    category_index,
    min_score_thresh=threshold,
    use_normalized_coordinates=True,
