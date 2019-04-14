@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import fnmatch
 import six.moves.urllib as urllib
 import sys
 import tarfile
@@ -306,7 +307,7 @@ def get_misclassification(file, n):
 
 """piece of code that represent the concrete detection, calling the TF session"""
 
-def processimages(detection_graph, path_images_dir, save_directory, threshold, n, lane_poly):
+def process_images(detection_graph, path_images_dir, save_directory, threshold, n, lane_poly):
   
   csv_file = 'object_detection/output_csv/csvfile.csv'
 
@@ -442,3 +443,25 @@ def visualize_boxes(image_path, detection_graph, threshold):
       plt.imshow(image_np)
       
       imageio.imwrite('object_detection/output_imgs/' + os.path.split(image_path)[1], image_np) # save csv to a different directory than annotated images
+
+
+
+def filter_data(pattern):
+  blocked = fnmatch.filter(os.listdir('object_detection/input_imgs/blocked'), '*' + pattern)
+  notblocked = fnmatch.filter(os.listdir('object_detection/input_imgs/notblocked'), '*' + pattern)
+
+  files = [blocked, notblocked]
+
+  return files
+
+
+def subset_data(pattern): 
+  if os.path.exists('object_detection/input_imgs_subset'):
+    shutil.rmtree('object_detection/input_imgs_subset')
+    os.makedirs('object_detection/input_imgs_subset/blocked')
+    os.makedirs('object_detection/input_imgs_subset/notblocked')
+  
+  for f in filter_data(pattern)[0]:
+      shutil.copy('object_detection/input_imgs/blocked/' + f, "object_detection/input_imgs_subset/blocked")
+  for f in filter_data(pattern)[1]:
+      shutil.copy('object_detection/input_imgs/notblocked/' + f, "object_detection/input_imgs_subset/notblocked")
