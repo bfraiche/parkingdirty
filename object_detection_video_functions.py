@@ -68,7 +68,7 @@ def visualize_boxes(image, box_val, class_val, score_val, threshold):
    image,
    np.squeeze(box_val),
    np.squeeze(class_val).astype(np.int32),
-   np.squeeze(score_val).astype(np.int32),
+   str(np.squeeze(score_val)),
    category_index,
    min_score_thresh=threshold,
    use_normalized_coordinates=True,
@@ -203,7 +203,6 @@ def process_video(video_file, detection_graph, threshold, lane_poly):
         src2 = cv2.fillPoly(image_np, lane, (255, 255, 0))
         frame_out = cv2.addWeighted(overlay, alpha, src2, beta, 0, image_np);
 
-        print(blocked_text)
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frame_out, 'blocked ' + str(blocked_text) + '% of the time',(10,500), font, 1,(255,255,255),2,cv2.LINE_AA)
         
