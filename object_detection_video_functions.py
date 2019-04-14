@@ -125,7 +125,7 @@ def process_frames(image_tensor, image_np_expanded, w, h, sess, detection_boxes,
       
     ind += 1
 
-    blocked_text = round(100 * blocked / ind, 0)
+    blocked_text = str(round(100 * blocked / ind, 0))
     
     print(blocked, ind)
   
