@@ -193,7 +193,7 @@ def analyze_image(image_path, path_images_dir, sess, image_tensor, detection_box
   return timestamp, img_name, img_labels, boxes, scores, classes, num
 
 
-def analyze_boxes(boxes, scores, classes, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+def analyze_boxes(boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
         num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
         num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
         num_cars_in_bikelane_04, num_cars_in_bikelane_045,
@@ -201,10 +201,8 @@ def analyze_boxes(boxes, scores, classes, pathbikelane, f, threshold, timestamp,
         num_bikes_in_bike_lane):
         for i in range(boxes.shape[0]):
            if scores[i] > threshold:
-              print(boxes[i].tolist())
               box = tuple(boxes[i].tolist())
-              print(box)
-              
+
               classes_int = np.squeeze(classes).astype(np.int32)
 
               if classes_int[i] in category_index.keys():
@@ -226,7 +224,8 @@ def analyze_boxes(boxes, scores, classes, pathbikelane, f, threshold, timestamp,
               p1 = Polygon([((xmax * 352),(ymax * 288)), ((xmin * 352),(ymax * 288)), ((xmin * 352),(ymin * 288)), ((xmax * 352),(ymin * 288))])
               
               # location of the bike lane
-              p2 = Polygon([(158,278),(126,272),(302,115),(310,116)])
+              p2 = Polygon(lane_poly)
+              print(lane_poly)
               
               # get intersection between object and bike lane
               p3 = p1.intersection(p2)
@@ -346,7 +345,7 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
     # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
     #      writer = Writer(image_path, width, height)
   
-          analyze_boxes(boxes, scores, classes, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+          analyze_boxes(boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
           num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
           num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
           num_cars_in_bikelane_04, num_cars_in_bikelane_045,
@@ -371,7 +370,7 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
     # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
     #      writer = Writer(image_path, width, height)
   
-          analyze_boxes(boxes, scores, classes, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+          analyze_boxes(boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
           num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
           num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
           num_cars_in_bikelane_04, num_cars_in_bikelane_045,
