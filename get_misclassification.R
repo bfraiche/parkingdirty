@@ -21,7 +21,8 @@ output <-
   mutate(value = if_else(value >= 1, 1, 0)) %>% 
   mutate(match = if_else(label == value, 1, 0)) %>% 
   filter(match == 0) %>% 
-  slice(1:args[2])
+  slice(1:args[2]) %>% 
+  mutate(image = str_remove_all(image, "object_detection/input_imgs_"))
 
 print(output)
   
