@@ -398,18 +398,7 @@ def visualize_boxes(image_path, detection_graph, threshold):
     with tf.Session(graph=detection_graph) as sess:
       # configure tf object detection API for boxes, scores, classes, and num of detections
       
-      sess.run(tf.global_variables_initializer())
-      #img = 1
-      # Definite input and output Tensors for detection_graph
-      image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
-      # Each box represents a part of the image where a particular object was detected.
-      detection_boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
-      # Each score represent how level of confidence for each of the objects.
-      # Score is shown on the result image, together with the class label.
-      detection_scores = detection_graph.get_tensor_by_name('detection_scores:0')
-      detection_classes = detection_graph.get_tensor_by_name('detection_classes:0')
-      num_detections = detection_graph.get_tensor_by_name('num_detections:0')
-      
+      image_tensor, detection_boxes, detection_scores, detection_classes, num_detections = set_up_detection(sess, detection_graph)
       image_np = cv2.imread(image_path)
      # image_np = cv2.cvtColor(image_np, cv2.COLOR_BGR2GRAY)
       IMAGE_SIZE = (12, 8)
@@ -438,11 +427,20 @@ def visualize_boxes(image_path, detection_graph, threshold):
           min_score_thresh=threshold,
           use_normalized_coordinates=True,
           line_thickness=2)
+          
+      lane = np.array([lane_poly], np.int32)
+      overlay = image_np.copy()
+      alpha = 0.7
+      beta = ( 1.0 - alpha );
+      
+      src2 = cv2.fillPoly(image_np, lane, (255, 255, 0))
+      frame_out = cv2.addWeighted(overlay, alpha, src2, beta, 0, image_np);
+
       
       plt.figure(figsize=IMAGE_SIZE)
-      plt.imshow(image_np)
+      plt.imshow(frame_out)
       
-      imageio.imwrite('object_detection/output_imgs/' + os.path.split(image_path)[1], image_np) # save csv to a different directory than annotated images
+      imageio.imwrite('object_detection/output_imgs/' + os.path.split(image_path)[1], frame_out) # save csv to a different directory than annotated images
 
 
 
