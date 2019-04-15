@@ -445,8 +445,9 @@ def visualize_boxes(image_path, detection_graph, threshold):
 
 
 def filter_data(pattern):
-  blocked = fnmatch.filter(os.listdir('object_detection/input_imgs/blocked'), '*' + pattern)
-  notblocked = fnmatch.filter(os.listdir('object_detection/input_imgs/notblocked'), '*' + pattern)
+  pattern = '*' + pattern + '*'
+  blocked = fnmatch.filter(os.listdir('object_detection/input_imgs/blocked'), pattern)
+  notblocked = fnmatch.filter(os.listdir('object_detection/input_imgs/notblocked'), pattern)
 
   files = [blocked, notblocked]
 
@@ -454,12 +455,13 @@ def filter_data(pattern):
 
 
 def subset_data(pattern): 
-  if os.path.exists('object_detection/input_imgs_subset'):
-    shutil.rmtree('object_detection/input_imgs_subset')
-    os.makedirs('object_detection/input_imgs_subset/blocked')
-    os.makedirs('object_detection/input_imgs_subset/notblocked')
+  pattern_path = 'object_detection/input_imgs_subset_' + pattern
+  if not os.path.exists(pattern_path):
+  #  shutil.rmtree('object_detection/input_imgs_subset')
+    os.makedirs(pattern_path + '/blocked')
+    os.makedirs(pattern_path + '/notblocked')
   
   for f in filter_data(pattern)[0]:
-      shutil.copy('object_detection/input_imgs/blocked/' + f, "object_detection/input_imgs_subset/blocked")
+      shutil.copy('object_detection/input_imgs/blocked/' + f, pattern_path + '/blocked')
   for f in filter_data(pattern)[1]:
-      shutil.copy('object_detection/input_imgs/notblocked/' + f, "object_detection/input_imgs_subset/notblocked")
+      shutil.copy('object_detection/input_imgs/notblocked/' + f, pattern_path + '/notblocked')
