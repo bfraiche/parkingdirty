@@ -200,9 +200,10 @@ def analyze_boxes(boxes, scores, classes, pathbikelane, f, threshold, timestamp,
         num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, 
         num_bikes_in_bike_lane):
         for i in range(boxes.shape[0]):
-           print(i)
            if scores[i] > threshold:
+              print(boxes[i].tolist())
               box = tuple(boxes[i].tolist())
+              print(box)
               
               classes_int = np.squeeze(classes).astype(np.int32)
 
