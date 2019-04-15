@@ -392,7 +392,7 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
 #detection_graph, label_map, categories, category_index = set_up_model('ssd_mobilenet_v1_fpn_shared_box_predictor_640x640_coco14_sync_2018_07_03')
 
 
-def visualize_boxes(image_path, detection_graph, threshold):
+def visualize_boxes(image_path, detection_graph, threshold, lane_poly):
 
   with detection_graph.as_default():
     with tf.Session(graph=detection_graph) as sess:
