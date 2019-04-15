@@ -200,6 +200,7 @@ def analyze_boxes(boxes, scores, classes, pathbikelane, f, threshold, timestamp,
         num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, 
         num_bikes_in_bike_lane):
         for i in range(boxes.shape[0]):
+           print(i)
            if scores[i] > threshold:
               box = tuple(boxes[i].tolist())
               
