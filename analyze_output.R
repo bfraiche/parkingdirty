@@ -18,9 +18,14 @@ output <-
   gather(key = 'threshold', value, -label, -image) %>% 
   mutate(value = if_else(value >= 1, 1, 0)) %>% 
   mutate(match = if_else(label == value, 1, 0)) %>% 
-  group_by(threshold) %>% 
+  mutate(false_pos = if_else(match == 0 & label == 0, 1, 0),
+         false_neg = if_else(match == 0 & label == 1, 1, 0)) %>%
+  group_by(threshold) %>%
   summarize(tot_correct = sum(match),
+            tot_false_pos = sum(false_pos),
+            tot_false_neg = sum(false_neg),
             perc_correct = tot_correct / n()) %>% 
   arrange(desc(tot_correct))
 
 print(output)
+
