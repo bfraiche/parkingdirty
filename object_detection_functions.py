@@ -225,7 +225,7 @@ def analyze_boxes(boxes, scores, classes, lane_poly, pathbikelane, f, threshold,
               
               # location of the bike lane
               p2 = Polygon(lane_poly)
-              print(lane_poly)
+              #print(lane_poly)
               
               # get intersection between object and bike lane
               p3 = p1.intersection(p2)
@@ -305,6 +305,18 @@ def get_misclassification(file, n):
   x = subprocess.check_output(cmd, universal_newlines=True)
 
   print(x)
+  
+def plot_classification_by_hour(file):
+
+  command = 'Rscript'
+  path2script = 'parkingdirty/mis_classification_by_time.R'
+
+  args = [file]
+  cmd = [command, path2script] + args
+  x = subprocess.check_output(cmd, universal_newlines=True)
+
+  print(x)
+
 
 """piece of code that represent the concrete detection, calling the TF session"""
 
