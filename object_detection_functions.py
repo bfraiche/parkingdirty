@@ -80,6 +80,28 @@ def download_data(cam):
     
     print('data downloaded successfully')
 
+# filters the data based on a regex pattern, returns two lists (vectors?) of the files matching in the blocked and not blocked files, respectively
+def filter_data(pattern):
+  pattern = '*' + pattern + '*'
+  blocked = fnmatch.filter(os.listdir('object_detection/input_imgs/blocked'), pattern)
+  notblocked = fnmatch.filter(os.listdir('object_detection/input_imgs/notblocked'), pattern)
+
+  files = [blocked, notblocked]
+
+  return files
+
+# use the filter function to then move the matching files into subdirectories to use for analysis
+def subset_data(pattern): 
+  pattern_path = 'object_detection/input_imgs_subset_' + pattern
+  if not os.path.exists(pattern_path):
+  #  shutil.rmtree('object_detection/input_imgs_subset')
+    os.makedirs(pattern_path + '/blocked')
+    os.makedirs(pattern_path + '/notblocked')
+  
+  for f in filter_data(pattern)[0]:
+      shutil.copy('object_detection/input_imgs/blocked/' + f, pattern_path + '/blocked')
+  for f in filter_data(pattern)[1]:
+      shutil.copy('object_detection/input_imgs/notblocked/' + f, pattern_path + '/notblocked')
 
 # model download process
 
@@ -193,12 +215,15 @@ def analyze_image(image_path, path_images_dir, sess, image_tensor, detection_box
   return timestamp, img_name, img_labels, boxes, scores, classes, num
 
 
-def analyze_boxes(boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+def analyze_boxes():
+  
+  global boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
         num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
         num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
         num_cars_in_bikelane_04, num_cars_in_bikelane_045,
         num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, 
-        num_bikes_in_bike_lane):
+        num_bikes_in_bike_lane
+        
         for i in range(boxes.shape[0]):
            if scores[i] > threshold:
               box = tuple(boxes[i].tolist())
@@ -279,45 +304,6 @@ def analyze_boxes(boxes, scores, classes, lane_poly, pathbikelane, f, threshold,
     # return the data table
         return f
     
-    
-# clone dan bernstein's parkingdirty repo to access the R script for analysis
-  
-  
-def get_optimal_threshold(file):
-
-  command = 'Rscript'
-  path2script = 'parkingdirty/analyze_output.R'
-
-  args = [file]
-  cmd = [command, path2script] + args
-  x = subprocess.check_output(cmd, universal_newlines=True)
-
-  print(x)
-  
-  
-def get_misclassification(file, n):
-
-  command = 'Rscript'
-  path2script = 'parkingdirty/get_misclassification.R'
-
-  args = [file, n]
-  cmd = [command, path2script] + args
-  x = subprocess.check_output(cmd, universal_newlines=True)
-
-  print(x)
-  
-def plot_classification_by_hour(file):
-
-  command = 'Rscript'
-  path2script = 'parkingdirty/mis_classification_by_time.R'
-
-  args = [file]
-  cmd = [command, path2script] + args
-  x = subprocess.check_output(cmd, universal_newlines=True)
-
-  print(x)
-
-
 """piece of code that represent the concrete detection, calling the TF session"""
 
 def process_images(detection_graph, path_images_dir, save_directory, threshold, n, lane_poly):
@@ -382,12 +368,7 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
     # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
     #      writer = Writer(image_path, width, height)
   
-          analyze_boxes(boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
-          num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
-          num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
-          num_cars_in_bikelane_04, num_cars_in_bikelane_045,
-          num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, 
-          num_bikes_in_bike_lane)
+          analyze_boxes()
 
           #print("Process Time " + str(time.time() - start_time))
           #scipy.misc.imsave('object_detection/output_imgs/' + os.path.split(image_path)[1], image_np) # save csv to a different directory than annotated images
@@ -420,13 +401,10 @@ def visualize_boxes(image_path, detection_graph, threshold, lane_poly):
  #     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
 #      image = clahe.apply(image_np)
 
-
-      
       # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
       image_np_expanded = np.expand_dims(image_np, axis=0)
-        
-        
-        # Actual detection.
+      
+      # Actual detection.
       (boxes, scores, classes, num) = sess.run(
           [detection_boxes, detection_scores, detection_classes, num_detections],
           feed_dict={image_tensor: image_np_expanded})# Visualization of the results of a detection.
@@ -455,26 +433,43 @@ def visualize_boxes(image_path, detection_graph, threshold, lane_poly):
       
       imageio.imwrite('object_detection/output_imgs/' + os.path.split(image_path)[1], frame_out) # save csv to a different directory than annotated images
 
+ 
+# clone dan bernstein's parkingdirty repo to access the R script for analysis
 
+def get_optimal_threshold(file):
 
-def filter_data(pattern):
-  pattern = '*' + pattern + '*'
-  blocked = fnmatch.filter(os.listdir('object_detection/input_imgs/blocked'), pattern)
-  notblocked = fnmatch.filter(os.listdir('object_detection/input_imgs/notblocked'), pattern)
+  command = 'Rscript'
+  path2script = 'parkingdirty/analyze_output.R'
 
-  files = [blocked, notblocked]
+  args = [file]
+  cmd = [command, path2script] + args
+  x = subprocess.check_output(cmd, universal_newlines=True)
 
-  return files
-
-
-def subset_data(pattern): 
-  pattern_path = 'object_detection/input_imgs_subset_' + pattern
-  if not os.path.exists(pattern_path):
-  #  shutil.rmtree('object_detection/input_imgs_subset')
-    os.makedirs(pattern_path + '/blocked')
-    os.makedirs(pattern_path + '/notblocked')
+  print(x)
   
-  for f in filter_data(pattern)[0]:
-      shutil.copy('object_detection/input_imgs/blocked/' + f, pattern_path + '/blocked')
-  for f in filter_data(pattern)[1]:
-      shutil.copy('object_detection/input_imgs/notblocked/' + f, pattern_path + '/notblocked')
+  
+def get_misclassification(file, n):
+
+  command = 'Rscript'
+  path2script = 'parkingdirty/get_misclassification.R'
+
+  args = [file, n]
+  cmd = [command, path2script] + args
+  x = subprocess.check_output(cmd, universal_newlines=True)
+
+  print(x)
+  
+def plot_classification_by_hour(file):
+
+  command = 'Rscript'
+  path2script = 'parkingdirty/mis_classification_by_time.R'
+
+  args = [file]
+  cmd = [command, path2script] + args
+  x = subprocess.check_output(cmd, universal_newlines=True)
+
+  print(x)
+
+
+
+
