@@ -80,28 +80,6 @@ def download_data(cam):
     
     print('data downloaded successfully')
 
-# filters the data based on a regex pattern, returns two lists (vectors?) of the files matching in the blocked and not blocked files, respectively
-def filter_data(pattern):
-  pattern = '*' + pattern + '*'
-  blocked = fnmatch.filter(os.listdir('object_detection/input_imgs/blocked'), pattern)
-  notblocked = fnmatch.filter(os.listdir('object_detection/input_imgs/notblocked'), pattern)
-
-  files = [blocked, notblocked]
-
-  return files
-
-# use the filter function to then move the matching files into subdirectories to use for analysis
-def subset_data(pattern): 
-  pattern_path = 'object_detection/input_imgs_subset_' + pattern
-  if not os.path.exists(pattern_path):
-  #  shutil.rmtree('object_detection/input_imgs_subset')
-    os.makedirs(pattern_path + '/blocked')
-    os.makedirs(pattern_path + '/notblocked')
-  
-  for f in filter_data(pattern)[0]:
-      shutil.copy('object_detection/input_imgs/blocked/' + f, pattern_path + '/blocked')
-  for f in filter_data(pattern)[1]:
-      shutil.copy('object_detection/input_imgs/notblocked/' + f, pattern_path + '/notblocked')
 
 # model download process
 
@@ -215,89 +193,131 @@ def analyze_image(image_path, path_images_dir, sess, image_tensor, detection_box
   return timestamp, img_name, img_labels, boxes, scores, classes, num
 
 
-def analyze_boxes():
-  
-  global boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015,num_cars_in_bikelane_02, num_cars_in_bikelane_025, num_cars_in_bikelane_03, num_cars_in_bikelane_035, num_cars_in_bikelane_04, num_cars_in_bikelane_045, num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, num_bikes_in_bike_lane
-        
-  for i in range(boxes.shape[0]):
-     if scores[i] > threshold:
-        box = tuple(boxes[i].tolist())
+def analyze_boxes(boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+        num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
+        num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
+        num_cars_in_bikelane_04, num_cars_in_bikelane_045,
+        num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, 
+        num_bikes_in_bike_lane):
+        for i in range(boxes.shape[0]):
+           if scores[i] > threshold:
+              box = tuple(boxes[i].tolist())
 
-        classes_int = np.squeeze(classes).astype(np.int32)
+              classes_int = np.squeeze(classes).astype(np.int32)
 
-        if classes_int[i] in category_index.keys():
-                            class_name = category_index[classes_int[i]]['name']  
+              if classes_int[i] in category_index.keys():
+                                  class_name = category_index[classes_int[i]]['name']  
 
 
-        ymin, xmin, ymax, xmax = box
+              ymin, xmin, ymax, xmax = box
 
-        # the box is given as a fraction of the distance in each dimension of the image
-        # so we have to multiple it by the image dimensions to get the center of each box, relative to the rest of the image
-        center_x = (((xmax * 352) - (xmin * 352)) / 2) + (xmin * 352) # x dimension of image
-        center_y = (((ymax * 288) - (ymin * 288)) / 2) + (ymin * 288) # y dimension of image
-        points = [(center_x, center_y)]
-        
-        # area of the object
-        obj_area =  ((xmax * 352) - (xmin * 352)) * ((ymax * 288) - (ymin * 288))
-        
-        # get the absolute position of the object in the image
-        p1 = Polygon([((xmax * 352),(ymax * 288)), ((xmin * 352),(ymax * 288)), ((xmin * 352),(ymin * 288)), ((xmax * 352),(ymin * 288))])
-        
-        # location of the bike lane
-        p2 = Polygon(lane_poly)
-        #print(lane_poly)
-        
-        # get intersection between object and bike lane
-        p3 = p1.intersection(p2)
-        
-        # get ratio of overlap to total object area
-        overlap = p3.area / obj_area
-        
-
-        #print(class_name)
-        if class_name in {'car', 'truck', 'bus', 'motorcycle','train','person'}:
-          if overlap >= 0.1:
-              num_cars_in_bikelane_01 += 1
-          if overlap >= 0.15:
-              num_cars_in_bikelane_015 += 1
-          if overlap >= 0.2:
-              num_cars_in_bikelane_02 += 1
-          if overlap >= 0.25:
-              num_cars_in_bikelane_025 += 1
-          if overlap >= 0.3:
-              num_cars_in_bikelane_03 += 1
-          if overlap >= 0.35:
-              num_cars_in_bikelane_035 += 1
-          if overlap >= 0.4:
-              num_cars_in_bikelane_04 += 1
-          if overlap >= 0.45:
-              num_cars_in_bikelane_045 += 1
-          if overlap >= 0.5:
-              num_cars_in_bikelane_05 += 1    
-          if pathbikelane.contains_points(points):
-              num_cars_in_bike_lane_contains +=1
-        
-        if class_name == 'bicycle':
-          if pathbikelane.contains_points(points):
-              num_bikes_in_bike_lane += 1    
+              # the box is given as a fraction of the distance in each dimension of the image
+              # so we have to multiple it by the image dimensions to get the center of each box, relative to the rest of the image
+              center_x = (((xmax * 352) - (xmin * 352)) / 2) + (xmin * 352) # x dimension of image
+              center_y = (((ymax * 288) - (ymin * 288)) / 2) + (ymin * 288) # y dimension of image
+              points = [(center_x, center_y)]
               
+              # area of the object
+              obj_area =  ((xmax * 352) - (xmin * 352)) * ((ymax * 288) - (ymin * 288))
+              
+              # get the absolute position of the object in the image
+              p1 = Polygon([((xmax * 352),(ymax * 288)), ((xmin * 352),(ymax * 288)), ((xmin * 352),(ymin * 288)), ((xmax * 352),(ymin * 288))])
+              
+              # location of the bike lane
+              p2 = Polygon(lane_poly)
+              #print(lane_poly)
+              
+              # get intersection between object and bike lane
+              p3 = p1.intersection(p2)
+              
+              # get ratio of overlap to total object area
+              overlap = p3.area / obj_area
+              
+
+              #print(class_name)
+              if class_name in {'car', 'truck', 'bus', 'motorcycle','train','person'}:
+                if overlap >= 0.1:
+                    num_cars_in_bikelane_01 += 1
+                if overlap >= 0.15:
+                    num_cars_in_bikelane_015 += 1
+                if overlap >= 0.2:
+                    num_cars_in_bikelane_02 += 1
+                if overlap >= 0.25:
+                    num_cars_in_bikelane_025 += 1
+                if overlap >= 0.3:
+                    num_cars_in_bikelane_03 += 1
+                if overlap >= 0.35:
+                    num_cars_in_bikelane_035 += 1
+                if overlap >= 0.4:
+                    num_cars_in_bikelane_04 += 1
+                if overlap >= 0.45:
+                    num_cars_in_bikelane_045 += 1
+                if overlap >= 0.5:
+                    num_cars_in_bikelane_05 += 1    
+                if pathbikelane.contains_points(points):
+                    num_cars_in_bike_lane_contains +=1
+              
+              if class_name == 'bicycle':
+                if pathbikelane.contains_points(points):
+                    num_bikes_in_bike_lane += 1    
+                    
  
-  f.write(timestamp + ',' + 
-          str(num_cars_in_bikelane_01) + ',' +
-          str(num_cars_in_bikelane_015) + ',' +
-          str(num_cars_in_bikelane_02) + ',' +
-          str(num_cars_in_bikelane_025) + ',' +
-          str(num_cars_in_bikelane_03) + ',' +
-          str(num_cars_in_bikelane_035) + ',' +
-          str(num_cars_in_bikelane_04) + ',' +
-          str(num_cars_in_bikelane_045) + ',' +
-          str(num_cars_in_bikelane_05) + ',' + 
-          str(num_cars_in_bike_lane_contains) + ',' + 
-          str(num_bikes_in_bike_lane) + ',' + 
-          str(img_labels) + '\n')
-  
-  return f
+        f.write(timestamp + ',' + 
+                str(num_cars_in_bikelane_01) + ',' +
+                str(num_cars_in_bikelane_015) + ',' +
+                str(num_cars_in_bikelane_02) + ',' +
+                str(num_cars_in_bikelane_025) + ',' +
+                str(num_cars_in_bikelane_03) + ',' +
+                str(num_cars_in_bikelane_035) + ',' +
+                str(num_cars_in_bikelane_04) + ',' +
+                str(num_cars_in_bikelane_045) + ',' +
+                str(num_cars_in_bikelane_05) + ',' + 
+                str(num_cars_in_bike_lane_contains) + ',' + 
+                str(num_bikes_in_bike_lane) + ',' + 
+                str(img_labels) + '\n')
     
+    # return the data table
+        return f
+    
+    
+# clone dan bernstein's parkingdirty repo to access the R script for analysis
+  
+  
+def get_optimal_threshold(file):
+
+  command = 'Rscript'
+  path2script = 'parkingdirty/analyze_output.R'
+
+  args = [file]
+  cmd = [command, path2script] + args
+  x = subprocess.check_output(cmd, universal_newlines=True)
+
+  print(x)
+  
+  
+def get_misclassification(file, n):
+
+  command = 'Rscript'
+  path2script = 'parkingdirty/get_misclassification.R'
+
+  args = [file, n]
+  cmd = [command, path2script] + args
+  x = subprocess.check_output(cmd, universal_newlines=True)
+
+  print(x)
+  
+def plot_classification_by_hour(file):
+
+  command = 'Rscript'
+  path2script = 'parkingdirty/mis_classification_by_time.R'
+
+  args = [file]
+  cmd = [command, path2script] + args
+  x = subprocess.check_output(cmd, universal_newlines=True)
+
+  print(x)
+
+
 """piece of code that represent the concrete detection, calling the TF session"""
 
 def process_images(detection_graph, path_images_dir, save_directory, threshold, n, lane_poly):
@@ -362,7 +382,12 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
     # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
     #      writer = Writer(image_path, width, height)
   
-          analyze_boxes()
+          analyze_boxes(boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+          num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
+          num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
+          num_cars_in_bikelane_04, num_cars_in_bikelane_045,
+          num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, 
+          num_bikes_in_bike_lane)
 
           #print("Process Time " + str(time.time() - start_time))
           #scipy.misc.imsave('object_detection/output_imgs/' + os.path.split(image_path)[1], image_np) # save csv to a different directory than annotated images
@@ -395,10 +420,13 @@ def visualize_boxes(image_path, detection_graph, threshold, lane_poly):
  #     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
 #      image = clahe.apply(image_np)
 
+
+      
       # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
       image_np_expanded = np.expand_dims(image_np, axis=0)
-      
-      # Actual detection.
+        
+        
+        # Actual detection.
       (boxes, scores, classes, num) = sess.run(
           [detection_boxes, detection_scores, detection_classes, num_detections],
           feed_dict={image_tensor: image_np_expanded})# Visualization of the results of a detection.
@@ -427,43 +455,26 @@ def visualize_boxes(image_path, detection_graph, threshold, lane_poly):
       
       imageio.imwrite('object_detection/output_imgs/' + os.path.split(image_path)[1], frame_out) # save csv to a different directory than annotated images
 
- 
-# clone dan bernstein's parkingdirty repo to access the R script for analysis
 
-def get_optimal_threshold(file):
 
-  command = 'Rscript'
-  path2script = 'parkingdirty/analyze_output.R'
+def filter_data(pattern):
+  pattern = '*' + pattern + '*'
+  blocked = fnmatch.filter(os.listdir('object_detection/input_imgs/blocked'), pattern)
+  notblocked = fnmatch.filter(os.listdir('object_detection/input_imgs/notblocked'), pattern)
 
-  args = [file]
-  cmd = [command, path2script] + args
-  x = subprocess.check_output(cmd, universal_newlines=True)
+  files = [blocked, notblocked]
 
-  print(x)
+  return files
+
+
+def subset_data(pattern): 
+  pattern_path = 'object_detection/input_imgs_subset_' + pattern
+  if not os.path.exists(pattern_path):
+  #  shutil.rmtree('object_detection/input_imgs_subset')
+    os.makedirs(pattern_path + '/blocked')
+    os.makedirs(pattern_path + '/notblocked')
   
-  
-def get_misclassification(file, n):
-
-  command = 'Rscript'
-  path2script = 'parkingdirty/get_misclassification.R'
-
-  args = [file, n]
-  cmd = [command, path2script] + args
-  x = subprocess.check_output(cmd, universal_newlines=True)
-
-  print(x)
-  
-def plot_classification_by_hour(file):
-
-  command = 'Rscript'
-  path2script = 'parkingdirty/mis_classification_by_time.R'
-
-  args = [file]
-  cmd = [command, path2script] + args
-  x = subprocess.check_output(cmd, universal_newlines=True)
-
-  print(x)
-
-
-
-
+  for f in filter_data(pattern)[0]:
+      shutil.copy('object_detection/input_imgs/blocked/' + f, pattern_path + '/blocked')
+  for f in filter_data(pattern)[1]:
+      shutil.copy('object_detection/input_imgs/notblocked/' + f, pattern_path + '/notblocked')
