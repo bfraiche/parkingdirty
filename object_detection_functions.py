@@ -221,85 +221,85 @@ def analyze_boxes():
   
   global boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, num_cars_in_bikelane_02, num_cars_in_bikelane_025, num_cars_in_bikelane_03, num_cars_in_bikelane_035,cnum_cars_in_bikelane_04, num_cars_in_bikelane_045, num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, num_bikes_in_bike_lane
         
-        for i in range(boxes.shape[0]):
-           if scores[i] > threshold:
-              box = tuple(boxes[i].tolist())
+  for i in range(boxes.shape[0]):
+     if scores[i] > threshold:
+        box = tuple(boxes[i].tolist())
 
-              classes_int = np.squeeze(classes).astype(np.int32)
+        classes_int = np.squeeze(classes).astype(np.int32)
 
-              if classes_int[i] in category_index.keys():
-                                  class_name = category_index[classes_int[i]]['name']  
+        if classes_int[i] in category_index.keys():
+                            class_name = category_index[classes_int[i]]['name']  
 
 
-              ymin, xmin, ymax, xmax = box
+        ymin, xmin, ymax, xmax = box
 
-              # the box is given as a fraction of the distance in each dimension of the image
-              # so we have to multiple it by the image dimensions to get the center of each box, relative to the rest of the image
-              center_x = (((xmax * 352) - (xmin * 352)) / 2) + (xmin * 352) # x dimension of image
-              center_y = (((ymax * 288) - (ymin * 288)) / 2) + (ymin * 288) # y dimension of image
-              points = [(center_x, center_y)]
-              
-              # area of the object
-              obj_area =  ((xmax * 352) - (xmin * 352)) * ((ymax * 288) - (ymin * 288))
-              
-              # get the absolute position of the object in the image
-              p1 = Polygon([((xmax * 352),(ymax * 288)), ((xmin * 352),(ymax * 288)), ((xmin * 352),(ymin * 288)), ((xmax * 352),(ymin * 288))])
-              
-              # location of the bike lane
-              p2 = Polygon(lane_poly)
-              #print(lane_poly)
-              
-              # get intersection between object and bike lane
-              p3 = p1.intersection(p2)
-              
-              # get ratio of overlap to total object area
-              overlap = p3.area / obj_area
-              
+        # the box is given as a fraction of the distance in each dimension of the image
+        # so we have to multiple it by the image dimensions to get the center of each box, relative to the rest of the image
+        center_x = (((xmax * 352) - (xmin * 352)) / 2) + (xmin * 352) # x dimension of image
+        center_y = (((ymax * 288) - (ymin * 288)) / 2) + (ymin * 288) # y dimension of image
+        points = [(center_x, center_y)]
+        
+        # area of the object
+        obj_area =  ((xmax * 352) - (xmin * 352)) * ((ymax * 288) - (ymin * 288))
+        
+        # get the absolute position of the object in the image
+        p1 = Polygon([((xmax * 352),(ymax * 288)), ((xmin * 352),(ymax * 288)), ((xmin * 352),(ymin * 288)), ((xmax * 352),(ymin * 288))])
+        
+        # location of the bike lane
+        p2 = Polygon(lane_poly)
+        #print(lane_poly)
+        
+        # get intersection between object and bike lane
+        p3 = p1.intersection(p2)
+        
+        # get ratio of overlap to total object area
+        overlap = p3.area / obj_area
+        
 
-              #print(class_name)
-              if class_name in {'car', 'truck', 'bus', 'motorcycle','train','person'}:
-                if overlap >= 0.1:
-                    num_cars_in_bikelane_01 += 1
-                if overlap >= 0.15:
-                    num_cars_in_bikelane_015 += 1
-                if overlap >= 0.2:
-                    num_cars_in_bikelane_02 += 1
-                if overlap >= 0.25:
-                    num_cars_in_bikelane_025 += 1
-                if overlap >= 0.3:
-                    num_cars_in_bikelane_03 += 1
-                if overlap >= 0.35:
-                    num_cars_in_bikelane_035 += 1
-                if overlap >= 0.4:
-                    num_cars_in_bikelane_04 += 1
-                if overlap >= 0.45:
-                    num_cars_in_bikelane_045 += 1
-                if overlap >= 0.5:
-                    num_cars_in_bikelane_05 += 1    
-                if pathbikelane.contains_points(points):
-                    num_cars_in_bike_lane_contains +=1
+        #print(class_name)
+        if class_name in {'car', 'truck', 'bus', 'motorcycle','train','person'}:
+          if overlap >= 0.1:
+              num_cars_in_bikelane_01 += 1
+          if overlap >= 0.15:
+              num_cars_in_bikelane_015 += 1
+          if overlap >= 0.2:
+              num_cars_in_bikelane_02 += 1
+          if overlap >= 0.25:
+              num_cars_in_bikelane_025 += 1
+          if overlap >= 0.3:
+              num_cars_in_bikelane_03 += 1
+          if overlap >= 0.35:
+              num_cars_in_bikelane_035 += 1
+          if overlap >= 0.4:
+              num_cars_in_bikelane_04 += 1
+          if overlap >= 0.45:
+              num_cars_in_bikelane_045 += 1
+          if overlap >= 0.5:
+              num_cars_in_bikelane_05 += 1    
+          if pathbikelane.contains_points(points):
+              num_cars_in_bike_lane_contains +=1
+        
+        if class_name == 'bicycle':
+          if pathbikelane.contains_points(points):
+              num_bikes_in_bike_lane += 1    
               
-              if class_name == 'bicycle':
-                if pathbikelane.contains_points(points):
-                    num_bikes_in_bike_lane += 1    
-                    
  
-        f.write(timestamp + ',' + 
-                str(num_cars_in_bikelane_01) + ',' +
-                str(num_cars_in_bikelane_015) + ',' +
-                str(num_cars_in_bikelane_02) + ',' +
-                str(num_cars_in_bikelane_025) + ',' +
-                str(num_cars_in_bikelane_03) + ',' +
-                str(num_cars_in_bikelane_035) + ',' +
-                str(num_cars_in_bikelane_04) + ',' +
-                str(num_cars_in_bikelane_045) + ',' +
-                str(num_cars_in_bikelane_05) + ',' + 
-                str(num_cars_in_bike_lane_contains) + ',' + 
-                str(num_bikes_in_bike_lane) + ',' + 
-                str(img_labels) + '\n')
-    
+  f.write(timestamp + ',' + 
+          str(num_cars_in_bikelane_01) + ',' +
+          str(num_cars_in_bikelane_015) + ',' +
+          str(num_cars_in_bikelane_02) + ',' +
+          str(num_cars_in_bikelane_025) + ',' +
+          str(num_cars_in_bikelane_03) + ',' +
+          str(num_cars_in_bikelane_035) + ',' +
+          str(num_cars_in_bikelane_04) + ',' +
+          str(num_cars_in_bikelane_045) + ',' +
+          str(num_cars_in_bikelane_05) + ',' + 
+          str(num_cars_in_bike_lane_contains) + ',' + 
+          str(num_bikes_in_bike_lane) + ',' + 
+          str(img_labels) + '\n')
+  
     # return the data table
-        return f
+  return f
     
 """piece of code that represent the concrete detection, calling the TF session"""
 
