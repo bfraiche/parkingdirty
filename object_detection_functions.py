@@ -175,7 +175,9 @@ def set_up_detection(sess, detection_graph):
   return image_tensor, detection_boxes, detection_scores, detection_classes, num_detections
 
 
-def analyze_image(image_path, path_images_dir, sess, image_tensor, detection_boxes, detection_scores, detection_classes, num_detections):
+def analyze_image(image_path, path_images_dir, sess):
+  
+  global image_tensor, detection_boxes, detection_scores, detection_classes, num_detections
   
   start_time = time.time()
   timestamp = image_path.split(".png")[0]
@@ -329,7 +331,7 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
         for image_path in [os.path.join(path, name) for path, subdirs, files in os.walk(path_images_dir) for name in files]:
   #       for image_path in [os.path.join(path, name) for path, subdirs, files in os.walk(path_images_dir) for name in files:
          
-          timestamp, img_name, img_labels, boxes, scores, classes, num = analyze_image(image_path, path_images_dir, sess, image_tensor, detection_boxes, detection_scores, detection_classes, num_detections)        
+          timestamp, img_name, img_labels, boxes, scores, classes, num = analyze_image(image_path, path_images_dir, sess)        
           
           num_cars_in_bikelane_01, num_cars_in_bikelane_015, num_cars_in_bikelane_02, num_cars_in_bikelane_025, num_cars_in_bikelane_03, num_cars_in_bikelane_035, num_cars_in_bikelane_04, num_cars_in_bikelane_045, num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, num_bikes_in_bike_lane = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0        
   
@@ -354,7 +356,7 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
         for image_path in [os.path.join(path, name) for path, subdirs, files in os.walk(path_images_dir) for name in files[:n]]:
   #       for image_path in [os.path.join(path, name) for path, subdirs, files in os.walk(path_images_dir) for name in files:
          
-          timestamp, img_name, img_labels, boxes, scores, classes, num = analyze_image(image_path, path_images_dir, sess, image_tensor, detection_boxes, detection_scores, detection_classes, num_detections)        
+          timestamp, img_name, img_labels, boxes, scores, classes, num = analyze_image(image_path, path_images_dir, sess)        
           
           num_cars_in_bikelane_01, num_cars_in_bikelane_015, num_cars_in_bikelane_02, num_cars_in_bikelane_025, num_cars_in_bikelane_03, num_cars_in_bikelane_035, num_cars_in_bikelane_04, num_cars_in_bikelane_045, num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, num_bikes_in_bike_lane = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0        
   
