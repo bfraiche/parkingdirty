@@ -220,11 +220,11 @@ def analyze_image(image_path, path_images_dir, sess):
 def analyze_boxes():
   
   global boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
-        num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
-        num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
-        num_cars_in_bikelane_04, num_cars_in_bikelane_045,
-        num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, 
-        num_bikes_in_bike_lane
+      num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
+      num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
+      num_cars_in_bikelane_04, num_cars_in_bikelane_045,
+      num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, 
+      num_bikes_in_bike_lane
         
         for i in range(boxes.shape[0]):
            if scores[i] > threshold:
