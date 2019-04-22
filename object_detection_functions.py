@@ -458,6 +458,7 @@ def visualize_boxes(image_path, detection_graph, threshold, lane_poly):
 
 
 def filter_data(pattern):
+  pattern = 'cam' + pattern
   pattern = '*' + pattern + '*'
   blocked = fnmatch.filter(os.listdir('object_detection/input_imgs/blocked'), pattern)
   notblocked = fnmatch.filter(os.listdir('object_detection/input_imgs/notblocked'), pattern)
@@ -467,7 +468,7 @@ def filter_data(pattern):
   return files
 
 
-def subset_data(pattern): 
+def subset_data(pattern):
   pattern_path = 'object_detection/input_imgs_subset_' + pattern
   if not os.path.exists(pattern_path):
   #  shutil.rmtree('object_detection/input_imgs_subset')
