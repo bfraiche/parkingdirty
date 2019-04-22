@@ -469,7 +469,7 @@ def filter_data(pattern):
 
 
 def subset_data(pattern):
-  pattern_path = 'object_detection/input_imgs_subset_' + pattern
+  pattern_path = 'object_detection/input_imgs_subset_cam' + pattern
   if not os.path.exists(pattern_path):
   #  shutil.rmtree('object_detection/input_imgs_subset')
     os.makedirs(pattern_path + '/blocked')
