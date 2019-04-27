@@ -329,6 +329,8 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
   print('starting processing')
   print(datetime.datetime.now())
   
+  print("lane polygon: " + lane_poly)
+  
   
   with detection_graph.as_default():
     with tf.Session(graph=detection_graph) as sess:
@@ -485,8 +487,8 @@ def get_polygon(camera):
   
   d = {'camera': ['cam31', 'cam135','cam68'],
      'polygon': [[(202,144),(213,145),(351,221),(350,240)],
-     [(158,278),(126,272),(302,115),(310,116)],
-     [(220,140),(241,143),(299,53),(291,52)]]
+                [(158,278),(126,272),(302,115),(310,116)],
+                [(220,140),(241,143),(299,53),(291,52)]]
     }
 
   df = pd.DataFrame(data=d)
@@ -590,7 +592,7 @@ def analyze_boxes_yolo(boxes, scores, classes, lane, threshold, timestamp, f, im
          
         pathbikelane = mpltPath.Path(lane)  
 #         #print(class_name)
-#         if class_name in {'car', 'truck', 'bus', 'motorcycle','train','person'}:
+    if class_name in {'car', 'truck', 'bus', 'motorcycle','train','person'}:
         if overlap >= 0.1:
             num_cars_in_bikelane_01 += 1
         if overlap >= 0.15:
@@ -719,6 +721,8 @@ def process_images_yolo(trained_model, path_images_dir, save_directory, threshol
   
   print('starting processing')
   print(datetime.datetime.now())
+  
+  print("lane polygon: " + lane_poly)
   
   num_cars_in_bikelane_01, num_cars_in_bikelane_015, num_cars_in_bikelane_02, num_cars_in_bikelane_025, num_cars_in_bikelane_03, num_cars_in_bikelane_035, num_cars_in_bikelane_04, num_cars_in_bikelane_045, num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, num_bikes_in_bike_lane = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0        
   
