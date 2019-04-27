@@ -329,7 +329,7 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
   print('starting processing')
   print(datetime.datetime.now())
   
-  print("lane polygon: " + lane_poly)
+  print("lane polygon: " + str(lane_poly))
   
   
   with detection_graph.as_default():
@@ -722,7 +722,7 @@ def process_images_yolo(trained_model, path_images_dir, save_directory, threshol
   print('starting processing')
   print(datetime.datetime.now())
   
-  print("lane polygon: " + lane_poly)
+  print("lane polygon: " + str(lane_poly))
   
   num_cars_in_bikelane_01, num_cars_in_bikelane_015, num_cars_in_bikelane_02, num_cars_in_bikelane_025, num_cars_in_bikelane_03, num_cars_in_bikelane_035, num_cars_in_bikelane_04, num_cars_in_bikelane_045, num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, num_bikes_in_bike_lane = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0        
   
