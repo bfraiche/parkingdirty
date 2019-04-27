@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import os
 import fnmatch
 import six.moves.urllib as urllib
@@ -13,7 +14,7 @@ from matplotlib import pyplot as plt
 import matplotlib.path as mpltPath
 
 
-from PIL import Image
+from PIL import Image, ImageOps
 import scipy.misc
 
 from object_detection.utils import label_map_util
@@ -31,9 +32,7 @@ import matplotlib.path as mpltPath
 
 from google.colab.patches import cv2_imshow 
 
-from PIL import ImageOps
 import imageio
-
 
 import subprocess # for running R script in python
 from shapely.geometry import Polygon # to measure overlap between bike lane and bounding boxes
@@ -199,6 +198,7 @@ def analyze_boxes(category_index, boxes, scores, classes, lane_poly, pathbikelan
         num_cars_in_bikelane_04, num_cars_in_bikelane_045,
         num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, 
         num_bikes_in_bike_lane):
+          
         for i in range(boxes.shape[0]):
            if scores[i] > threshold:
               box = tuple(boxes[i].tolist())
@@ -638,32 +638,46 @@ def analyze_boxes_yolo(boxes, scores, classes, lane, threshold, timestamp, f, im
 
 
 def process_polygons(box, lane):
+  
   ymin, xmin, ymax, xmax = box
   # print(box)  
   # the box is given as a fraction of the distance in each dimension of the image
   # so we have to multiple it by the image dimensions to get the center of each box, relative to the rest of the image
-  center_x = (((xmax) - (xmin)) / 2) + (xmin) # x dimension of image
-  center_y = (((ymax) - (ymin)) / 2) + (ymin) # y dimension of image
-  points = [(center_x, center_y)]
-  
-  # area of the object
-  obj_area =  ((xmax) - (xmin)) * ((ymax) - (ymin))
-  
-  # get the absolute position of the object in the image
-  p1 = Polygon([((xmax),(ymax)), ((xmin),(ymax)), ((xmin),(ymin)), ((xmax),(ymin))])
-  
-  # location of the bike lane
-  p2 = Polygon(lane * 1.777)
-  #  print(p2)
-  
+  if model == "yolo":
+    center_x = (((xmax) - (xmin)) / 2) + (xmin) # x dimension of image
+    center_y = (((ymax) - (ymin)) / 2) + (ymin) # y dimension of image
+
+    points = [(center_x, center_y)]
+    
+    # area of the object
+    obj_area =  ((xmax) - (xmin)) * ((ymax) - (ymin))
+    
+    # get the absolute position of the object in the image
+    p1 = Polygon([((xmax),(ymax)), ((xmin),(ymax)), ((xmin),(ymin)), ((xmax),(ymin))])
+    
+    # location of the bike lane
+    p2 = Polygon(lane * 1.777)
+    #  print(p2)
+  else: 
+    center_x = (((xmax * 352) - (xmin * 352)) / 2) + (xmin * 352) # x dimension of image
+    center_y = (((ymax * 288) - (ymin * 288)) / 2) + (ymin * 288) # y dimension of image
+    points = [(center_x, center_y)]
+    
+    # area of the object
+    obj_area =  ((xmax * 352) - (xmin * 352)) * ((ymax * 288) - (ymin * 288))
+    
+    # get the absolute position of the object in the image
+    p1 = Polygon([((xmax * 352),(ymax * 288)), ((xmin * 352),(ymax * 288)), ((xmin * 352),(ymin * 288)), ((xmax * 352),(ymin * 288))])
+    
+    # location of the bike lane
+    p2 = Polygon(lane_poly)
+    #print(lane_poly)
+    
   # get intersection between object and bike lane
   p3 = p1.intersection(p2)
-  # print(p3)
-  
   # get ratio of overlap to total object area
   overlap = p3.area / obj_area        
-  # print(overlap)
-  
+
   return points, overlap # the two values needed to access overlap
 
 
