@@ -479,3 +479,319 @@ def subset_data(pattern):
       shutil.copy('object_detection/input_imgs/blocked/' + f, pattern_path + '/blocked')
   for f in filter_data(pattern)[1]:
       shutil.copy('object_detection/input_imgs/notblocked/' + f, pattern_path + '/notblocked')
+      
+      
+def get_polygon(camera):
+  
+  d = {'camera': ['cam31', 'cam135','cam68'],
+     'polygon': [[(202,144),(213,145),(351,221),(350,240)],
+     [(158,278),(126,272),(302,115),(310,116)],
+     [(220,140),(241,143),(299,53),(291,52)]]
+    }
+
+  df = pd.DataFrame(data=d)
+
+  poly = df.polygon[df.camera == 'cam' + str(camera)].values[0]
+  
+  return poly      
+  
+
+
+
+def set_up_model_yolo(trained_model):
+    net = model_zoo.get_model(trained_model, pretrained=True)
+    
+    return net
+
+def analyze_image_yolo(net, image_path, path_images_dir, lane_poly, threshold):
+  
+  start_time = time.time()
+  timestamp = image_path.split(".png")[0]
+  img_name = timestamp.split("/")[-1]
+
+
+  # the array based representation of the image will be used later in order to prepare the
+  # result image with boxes and labels on it.
+  try:
+      image = Image.open(image_path)
+      image_np = load_image_into_numpy_array(image)
+  except IOError:
+    print("Issue opening "+image_path)
+    
+    
+  width, height = image.size
+
+        
+  # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
+  image_np_expanded = np.expand_dims(image_np, axis=0)
+  
+  # if the image file name contains "not" then assigned 0, otherwise 1, so 1 is blocked, 0 is notblocked
+  if os.path.join(path_images_dir + "/" + image_path).find('not') is not -1:
+    img_labels = 0
+  else:
+    img_labels = 1 
+
+  # Actual detection
+  x, img = data.transforms.presets.yolo.load_test(image_path, short=512)
+  
+  width_transform = img.shape[1]
+  height_transform = img.shape[0]
+
+  
+  width_ratio = width_transform / width
+  height_ratio = height_transform / height
+#  print(width_ratio, height_ratio)
+  
+ # print(width, width_transform)
+ # print(height, height_transform)
+  
+  # DETECTION ------------------------------------------------------------------
+  
+  classes, scores, boxes = net(x)
+  
+
+  ax = utils.viz.plot_bbox(img, boxes[0], scores[0],
+                           classes[0], thresh = threshold, class_names=net.classes)
+  
+  lane = np.array(lane_poly, np.int32)
+  lane = lane * width_ratio
+
+  patch = patches.Polygon(lane, alpha = 0.4)
+  
+  ax.add_patch(patch)
+  
+  plt.savefig('object_detection/output_imgs/' + os.path.split(image_path)[1])
+
+  
+  return timestamp, img_name, img_labels, boxes, scores, classes, width_transform, height_transform
+
+
+
+def analyze_boxes_yolo(boxes, scores, classes, lane, threshold, timestamp, f, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+  num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
+  num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
+  num_cars_in_bikelane_04, num_cars_in_bikelane_045,
+  num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, 
+  num_bikes_in_bike_lane):
+  
+  boxes = np.squeeze(boxes)
+  scores = np.squeeze(scores)
+  for i in range(boxes.shape[0]):
+     if scores[i] > threshold:
+        box = tuple(boxes[i].asnumpy().tolist())
+        
+        points, overlap = process_polygons(box, lane)
+        
+#         classes_int = np.squeeze(classes).astype(np.int32)
+  
+#         if classes_int[i] in category_index.keys():
+#                             class_name = category_index[classes_int[i]]['name']  
+  
+         
+        pathbikelane = mpltPath.Path(lane)  
+#         #print(class_name)
+#         if class_name in {'car', 'truck', 'bus', 'motorcycle','train','person'}:
+        if overlap >= 0.1:
+            num_cars_in_bikelane_01 += 1
+        if overlap >= 0.15:
+            num_cars_in_bikelane_015 += 1
+        if overlap >= 0.2:
+            num_cars_in_bikelane_02 += 1
+        if overlap >= 0.25:
+            num_cars_in_bikelane_025 += 1
+        if overlap >= 0.3:
+            num_cars_in_bikelane_03 += 1
+        if overlap >= 0.35:
+            num_cars_in_bikelane_035 += 1
+        if overlap >= 0.4:
+            num_cars_in_bikelane_04 += 1
+        if overlap >= 0.45:
+            num_cars_in_bikelane_045 += 1
+        if overlap >= 0.5:
+            num_cars_in_bikelane_05 += 1    
+        if pathbikelane.contains_points(points):
+            num_cars_in_bike_lane_contains +=1
+            
+      
+#     if class_name == 'bicycle':
+#       if pathbikelane.contains_points(points):
+#           num_bikes_in_bike_lane += 1    
+            
+  print(num_cars_in_bikelane_03)
+  
+  f.write(timestamp + ',' + 
+          str(num_cars_in_bikelane_01) + ',' +
+          str(num_cars_in_bikelane_015) + ',' +
+          str(num_cars_in_bikelane_02) + ',' +
+          str(num_cars_in_bikelane_025) + ',' +
+          str(num_cars_in_bikelane_03) + ',' +
+          str(num_cars_in_bikelane_035) + ',' +
+          str(num_cars_in_bikelane_04) + ',' +
+          str(num_cars_in_bikelane_045) + ',' +
+          str(num_cars_in_bikelane_05) + ',' + 
+          str(num_cars_in_bike_lane_contains) + ',' + 
+          str(num_bikes_in_bike_lane) + ',' + 
+          str(img_labels) + '\n')
+  
+ #  return the data table
+  return f
+
+
+def process_polygons(box, lane):
+  ymin, xmin, ymax, xmax = box
+  # print(box)  
+  # the box is given as a fraction of the distance in each dimension of the image
+  # so we have to multiple it by the image dimensions to get the center of each box, relative to the rest of the image
+  center_x = (((xmax) - (xmin)) / 2) + (xmin) # x dimension of image
+  center_y = (((ymax) - (ymin)) / 2) + (ymin) # y dimension of image
+  points = [(center_x, center_y)]
+  
+  # area of the object
+  obj_area =  ((xmax) - (xmin)) * ((ymax) - (ymin))
+  
+  # get the absolute position of the object in the image
+  p1 = Polygon([((xmax),(ymax)), ((xmin),(ymax)), ((xmin),(ymin)), ((xmax),(ymin))])
+  
+  # location of the bike lane
+  p2 = Polygon(lane * 1.777)
+  #  print(p2)
+  
+  # get intersection between object and bike lane
+  p3 = p1.intersection(p2)
+  # print(p3)
+  
+  # get ratio of overlap to total object area
+  overlap = p3.area / obj_area        
+  # print(overlap)
+  
+  return points, overlap # the two values needed to access overlap
+
+
+def calculate_overlap(points, overlap):
+  if overlap >= 0.1:
+      num_cars_in_bikelane_01 += 1
+  if overlap >= 0.15:
+      num_cars_in_bikelane_015 += 1
+  if overlap >= 0.2:
+      num_cars_in_bikelane_02 += 1
+  if overlap >= 0.25:
+      num_cars_in_bikelane_025 += 1
+  if overlap >= 0.3:
+      num_cars_in_bikelane_03 += 1
+  if overlap >= 0.35:
+      num_cars_in_bikelane_035 += 1
+  if overlap >= 0.4:
+      num_cars_in_bikelane_04 += 1
+  if overlap >= 0.45:
+      num_cars_in_bikelane_045 += 1
+  if overlap >= 0.5:
+      num_cars_in_bikelane_05 += 1    
+  if pathbikelane.contains_points(points):
+      num_cars_in_bike_lane_contains +=1
+      
+  return 
+      
+  
+#     if class_name == 'bicycle':
+#       if pathbikelane.contains_points(points):
+#           num_bikes_in_bike_lane += 1    
+
+
+def process_images_yolo(trained_model, path_images_dir, save_directory, threshold, n, lane_poly):
+  
+  csv_file = 'object_detection/output_csv/csvfile.csv'
+
+  f = open(csv_file, 'w')
+  
+  print('starting processing')
+  print(datetime.datetime.now())
+  
+  num_cars_in_bikelane_01, num_cars_in_bikelane_015, num_cars_in_bikelane_02, num_cars_in_bikelane_025, num_cars_in_bikelane_03, num_cars_in_bikelane_035, num_cars_in_bikelane_04, num_cars_in_bikelane_045, num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, num_bikes_in_bike_lane = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0        
+  
+  lane = np.array(lane_poly)
+  
+  pathbikelane = mpltPath.Path(lane)
+
+  
+  # configure tf object detection API for boxes, scores, classes, and num of detections
+ # net = model_zoo.get_model('yolo3_darknet53_voc', pretrained=True)
+    
+    # loop through the object detection algorithm for each image
+  if n == 'all':  
+    # used this path join in the for loop to get both the 'blocked' and 'notblocked' folders
+    for image_path in [os.path.join(path, name) for path, subdirs, files in os.walk(path_images_dir) for name in files]:
+     
+      timestamp, img_name, img_labels, boxes, scores, classes, width_transform, height_transform = analyze_image_yolo(trained_model, image_path, 'object_detection/input_imgs', lane_poly, threshold)
+  
+      # the lane polygon is specific to each camera at a particular point in time
+      # it could change if the camera's perspective is changed
+      # a more robust solution would automatically identify bike lanes
+      # lane points identified with: https://www.image-map.net/
+      # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
+  
+      analyze_boxes_yolo(boxes, scores, classes, lane, threshold, timestamp, img_labels,num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+        num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
+        num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
+        num_cars_in_bikelane_04, num_cars_in_bikelane_045,
+        num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, 
+        num_bikes_in_bike_lane) 
+  else:  
+    # used this path join in the for loop to get both the 'blocked' and 'notblocked' folders
+    for image_path in [os.path.join(path, name) for path, subdirs, files in os.walk(path_images_dir) for name in files[:n]]:
+      print(image_path)
+      timestamp, img_name, img_labels, boxes, scores, classes, width_transform, height_transform = analyze_image_yolo(trained_model, image_path, 'object_detection/input_imgs', lane_poly, threshold)
+  
+      # the lane polygon is specific to each camera at a particular point in time
+      # it could change if the camera's perspective is changed
+      # a more robust solution would automatically identify bike lanes
+      # lane points identified with: https://www.image-map.net/
+  
+ # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
+  
+      analyze_boxes_yolo(boxes, scores, classes, lane, threshold, timestamp, f, img_labels,num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+        num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
+        num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
+        num_cars_in_bikelane_04, num_cars_in_bikelane_045,
+        num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, 
+        num_bikes_in_bike_lane) 
+    
+
+      #print("Process Time " + str(time.time() - start_time))
+      #scipy.misc.imsave('object_detection/output_imgs/' + os.path.split(image_path)[1], image_np) # save csv to a different directory than annotated images
+    
+  f.close()
+  print('successfully run')
+  print(datetime.datetime.now())
+  return csv_file
+  
+  
+def run_model(model, pattern, threshold, n):
+  pattern = pattern
+  subset_data(pattern)
+  polygon = get_polygon(pattern)
+
+  if model == "yolo":
+    net = set_up_model_yolo('yolo3_darknet53_voc')
+
+    process_images_yolo(net, 
+                 'object_detection/input_imgs_subset_cam' + str(pattern), # path to subdirectory of images
+                 'object_detection/output_imgs', # where to put output images, if visualization is included
+                 threshold,  # threshold for classification
+                 n, # number of images to process from each folder
+                 polygon)
+  else:
+    detection_graph, label_map, categories, category_index = set_up_model(model)
+
+    ## run the detection and classification processing
+    ## args: detection_graph from set_up_model(), the input dir, output dir, threshold for obstacle detection, and number of images to process
+    ## get lane polygon from https://www.image-map.net/
+    process_images(detection_graph, 
+                   'object_detection/input_imgs_subset_cam' + str(pattern), # path to subdirectory of images
+                   'object_detection/output_imgs', # where to put output images, if visualization is included
+                   threshold,  # threshold for classification
+                   n, # number of images to process from each folder
+                   polygon,
+                   category_index)
+    
+    print('done')
+
