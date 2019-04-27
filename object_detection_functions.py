@@ -320,7 +320,7 @@ def plot_classification_by_hour(file):
 
 """piece of code that represent the concrete detection, calling the TF session"""
 
-def process_images(detection_graph, path_images_dir, save_directory, threshold, n, lane_poly):
+def process_images(detection_graph, path_images_dir, save_directory, threshold, n, lane_poly, category_index):
   
   csv_file = 'object_detection/output_csv/csvfile.csv'
 
