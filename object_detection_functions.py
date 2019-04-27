@@ -592,7 +592,7 @@ def analyze_boxes_yolo(boxes, scores, classes, lane, threshold, timestamp, f, im
          
         pathbikelane = mpltPath.Path(lane)  
 #         #print(class_name)
-    if class_name in {'car', 'truck', 'bus', 'motorcycle','train','person'}:
+      if class_name in {'car', 'truck', 'bus', 'motorcycle','train','person'}:
         if overlap >= 0.1:
             num_cars_in_bikelane_01 += 1
         if overlap >= 0.15:
