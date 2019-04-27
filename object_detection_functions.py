@@ -193,7 +193,7 @@ def analyze_image(image_path, path_images_dir, sess, image_tensor, detection_box
   return timestamp, img_name, img_labels, boxes, scores, classes, num
 
 
-def analyze_boxes(boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+def analyze_boxes(category_index, boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
         num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
         num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
         num_cars_in_bikelane_04, num_cars_in_bikelane_045,
@@ -357,7 +357,7 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
     # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
     #      writer = Writer(image_path, width, height)
   
-          analyze_boxes(boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+          analyze_boxes(category_index, boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
           num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
           num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
           num_cars_in_bikelane_04, num_cars_in_bikelane_045,
@@ -382,7 +382,7 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
     # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
     #      writer = Writer(image_path, width, height)
   
-          analyze_boxes(boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+          analyze_boxes(category_index, boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
           num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
           num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
           num_cars_in_bikelane_04, num_cars_in_bikelane_045,
