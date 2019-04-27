@@ -592,27 +592,27 @@ def analyze_boxes_yolo(boxes, scores, classes, lane, threshold, timestamp, f, im
          
         pathbikelane = mpltPath.Path(lane)  
 #         #print(class_name)
-      if class_name in {'car', 'truck', 'bus', 'motorcycle','train','person'}:
-        if overlap >= 0.1:
-            num_cars_in_bikelane_01 += 1
-        if overlap >= 0.15:
-            num_cars_in_bikelane_015 += 1
-        if overlap >= 0.2:
-            num_cars_in_bikelane_02 += 1
-        if overlap >= 0.25:
-            num_cars_in_bikelane_025 += 1
-        if overlap >= 0.3:
-            num_cars_in_bikelane_03 += 1
-        if overlap >= 0.35:
-            num_cars_in_bikelane_035 += 1
-        if overlap >= 0.4:
-            num_cars_in_bikelane_04 += 1
-        if overlap >= 0.45:
-            num_cars_in_bikelane_045 += 1
-        if overlap >= 0.5:
-            num_cars_in_bikelane_05 += 1    
-        if pathbikelane.contains_points(points):
-            num_cars_in_bike_lane_contains +=1
+        if class_name in {'car', 'truck', 'bus', 'motorcycle','train','person'}:
+          if overlap >= 0.1:
+              num_cars_in_bikelane_01 += 1
+          if overlap >= 0.15:
+              num_cars_in_bikelane_015 += 1
+          if overlap >= 0.2:
+              num_cars_in_bikelane_02 += 1
+          if overlap >= 0.25:
+              num_cars_in_bikelane_025 += 1
+          if overlap >= 0.3:
+              num_cars_in_bikelane_03 += 1
+          if overlap >= 0.35:
+              num_cars_in_bikelane_035 += 1
+          if overlap >= 0.4:
+              num_cars_in_bikelane_04 += 1
+          if overlap >= 0.45:
+              num_cars_in_bikelane_045 += 1
+          if overlap >= 0.5:
+              num_cars_in_bikelane_05 += 1    
+          if pathbikelane.contains_points(points):
+              num_cars_in_bike_lane_contains +=1
             
       
 #     if class_name == 'bicycle':
