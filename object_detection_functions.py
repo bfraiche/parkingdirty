@@ -205,9 +205,6 @@ def analyze_boxes(category_index, boxes, scores, classes, lane_poly, pathbikelan
 
               classes_int = np.squeeze(classes).astype(np.int32)
               
-              print(classes_int)
-              print(category_index)
-
               if classes_int[i] in category_index.keys():
                 class_name = category_index[classes_int[i]]['name']  
 
@@ -614,6 +611,9 @@ def analyze_boxes_yolo(category_index, boxes, scores, classes, lane, threshold, 
         points, overlap = process_polygons(box, lane)
         
         classes_int = np.squeeze(classes).astype(np.int32)          
+        print(classes_int)
+        print(category_index)
+
         
         if classes_int[i] in category_index.keys():
           class_name = category_index[classes_int[i]]['name']  
