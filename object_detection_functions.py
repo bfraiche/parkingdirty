@@ -725,7 +725,7 @@ def process_images_yolo(model, trained_model, path_images_dir, save_directory, t
     # used this path join in the for loop to get both the 'blocked' and 'notblocked' folders
     for image_path in [os.path.join(path, name) for path, subdirs, files in os.walk(path_images_dir) for name in files]:
      
-      timestamp, img_name, img_labels, boxes, scores, classes, width_transform, height_transform, lane = analyze_image_yolo(trained_model, image_path, 'object_detection/input_imgs', lane_poly, threshold)
+      timestamp, img_name, img_labels, boxes, scores, classes, width_transform, height_transform = analyze_image_yolo(trained_model, image_path, 'object_detection/input_imgs', lane_poly, threshold)
   
       # the lane polygon is specific to each camera at a particular point in time
       # it could change if the camera's perspective is changed
@@ -743,7 +743,7 @@ def process_images_yolo(model, trained_model, path_images_dir, save_directory, t
     # used this path join in the for loop to get both the 'blocked' and 'notblocked' folders
     for image_path in [os.path.join(path, name) for path, subdirs, files in os.walk(path_images_dir) for name in files[:n]]:
       #print(image_path)
-      timestamp, img_name, img_labels, boxes, scores, classes, width_transform, height_transform, lane = analyze_image_yolo(trained_model, image_path, 'object_detection/input_imgs', lane_poly, threshold)
+      timestamp, img_name, img_labels, boxes, scores, classes, width_transform, height_transform = analyze_image_yolo(trained_model, image_path, 'object_detection/input_imgs', lane_poly, threshold)
   
       # the lane polygon is specific to each camera at a particular point in time
       # it could change if the camera's perspective is changed
