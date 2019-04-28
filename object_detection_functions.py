@@ -308,7 +308,7 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
 
   f = open(csv_file, 'w')
   
-  print('starting processing at ' + datetime.datetime.now())
+  print('starting processing at ' + str(datetime.datetime.now()))
   print("lane polygon: " + str(lane_poly))
   
   with detection_graph.as_default():
@@ -360,7 +360,7 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
           #scipy.misc.imsave('object_detection/output_imgs/' + os.path.split(image_path)[1], image_np) # save csv to a different directory than annotated images
         
   f.close()
-  print('successfully run at ' + datetime.datetime.now())
+  print('successfully run at ' + str(datetime.datetime.now()))
   return csv_file
 
 # set up the model
