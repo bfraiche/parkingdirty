@@ -822,7 +822,8 @@ def run_model(model, pattern, threshold, n):
                  'object_detection/output_imgs', # where to put output images, if visualization is included
                  threshold,  # threshold for classification
                  n, # number of images to process from each folder
-                 polygon)
+                 polygon,
+                 category_index)
   else:
     detection_graph, label_map, categories, category_index = set_up_model(model)
 
