@@ -204,9 +204,9 @@ def analyze_boxes(category_index, boxes, scores, classes, lane_poly, pathbikelan
               box = tuple(boxes[i].tolist())
 
               classes_int = np.squeeze(classes).astype(np.int32)
-
+              
               if classes_int[i] in category_index.keys():
-                                  class_name = category_index[classes_int[i]]['name']  
+                class_name = category_index[classes_int[i]]['name']  
 
 
               ymin, xmin, ymax, xmax = box
@@ -257,9 +257,9 @@ def analyze_boxes(category_index, boxes, scores, classes, lane_poly, pathbikelan
                 if pathbikelane.contains_points(points):
                     num_cars_in_bike_lane_contains +=1
               
-              if class_name == 'bicycle':
-                if pathbikelane.contains_points(points):
-                    num_bikes_in_bike_lane += 1    
+#              if class_name == 'bicycle':
+#                if pathbikelane.contains_points(points):
+#                    num_bikes_in_bike_lane += 1    
                     
  
         f.write(timestamp + ',' + 
@@ -603,7 +603,7 @@ def analyze_boxes_yolo(category_index, boxes, scores, classes, lane, threshold, 
   
   boxes = np.squeeze(boxes)
   scores = np.squeeze(scores)
-  print(scores)
+ # print(scores)
   for i in range(boxes.shape[0]):
      if scores[i] > threshold:
         box = tuple(boxes[i].asnumpy().tolist())
@@ -612,7 +612,7 @@ def analyze_boxes_yolo(category_index, boxes, scores, classes, lane, threshold, 
         
         classes_int = np.squeeze(classes).astype(np.int32)          
         
-        if classes_int[i] in category_index.keys():                             
+        if classes_int[i] in category_index.keys():
           class_name = category_index[classes_int[i]]['name']  
   
          
