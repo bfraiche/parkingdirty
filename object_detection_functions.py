@@ -192,7 +192,7 @@ def analyze_image(image_path, path_images_dir, sess, image_tensor, detection_box
   return timestamp, img_name, img_labels, boxes, scores, classes, num
 
 
-def analyze_boxes(category_index, boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+def analyze_boxes(model, category_index, boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
         num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
         num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
         num_cars_in_bikelane_04, num_cars_in_bikelane_045,
@@ -214,7 +214,7 @@ def analyze_boxes(category_index, boxes, scores, classes, lane_poly, pathbikelan
             #  print(lane_poly)
               # the box is given as a fraction of the distance in each dimension of the image
               # so we have to multiple it by the image dimensions to get the center of each box, relative to the rest of the image
-              points, overlap = process_polygons(box, lane_poly)
+              points, overlap = process_polygons(model, box, lane_poly)
 
               #print(class_name)
               if class_name in {'car', 'truck', 'bus', 'motorcycle','person'}:
@@ -337,7 +337,7 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
     # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
     #      writer = Writer(image_path, width, height)
   
-          analyze_boxes(category_index, boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+          analyze_boxes(model, category_index, boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
           num_cars_in_bikelane_02, num_cars_in_bikelane_025, num_cars_in_bikelane_03, num_cars_in_bikelane_035, num_cars_in_bikelane_04, num_cars_in_bikelane_045,
           num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, num_bikes_in_bike_lane)
       else:  
@@ -352,7 +352,7 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
     # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
     #      writer = Writer(image_path, width, height)
   
-          analyze_boxes(category_index, boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+          analyze_boxes(model, category_index, boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
           num_cars_in_bikelane_02, num_cars_in_bikelane_025, num_cars_in_bikelane_03, num_cars_in_bikelane_035, num_cars_in_bikelane_04, num_cars_in_bikelane_045,
           num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, num_bikes_in_bike_lane)
 
@@ -573,10 +573,8 @@ def analyze_boxes_yolo(model, category_index, boxes, scores, classes, lane_poly,
      if scores[i] > threshold:
         box = tuple(boxes[i].asnumpy().tolist())
         
-        print(lane_poly)
         points, overlap = process_polygons(model, box, lane_poly)
-        print(overlap)
-        
+
         pathbikelane = mpltPath.Path(lane_poly)  
 
         if classes_int[i] in {3, 8, 6, 4, 1}:
@@ -664,7 +662,8 @@ def process_polygons(model, box, lane):
   # get intersection between object and bike lane
   p3 = p1.intersection(p2)
   # get ratio of overlap to total object area
-  overlap = p3.area / obj_area        
+  overlap = p3.area / obj_area  
+  print(overlap)
 
   return points, overlap # the two values needed to access overlap
 
