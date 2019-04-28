@@ -739,7 +739,7 @@ def calculate_overlap(points, overlap):
 #           num_bikes_in_bike_lane += 1    
 
 
-def process_images_yolo(trained_model, path_images_dir, save_directory, threshold, n, lane_poly):
+def process_images_yolo(trained_model, path_images_dir, save_directory, threshold, n, lane_poly, category_index):
   
   csv_file = 'object_detection/output_csv/csvfile.csv'
 
