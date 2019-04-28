@@ -308,9 +308,7 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
 
   f = open(csv_file, 'w')
   
-  print('starting processing')
-  print(datetime.datetime.now())
-  
+  print('starting processing at ' + datetime.datetime.now())
   print("lane polygon: " + str(lane_poly))
   
   with detection_graph.as_default():
@@ -318,9 +316,15 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
       
       # configure tf object detection API for boxes, scores, classes, and num of detections
       image_tensor, detection_boxes, detection_scores, detection_classes, num_detections = set_up_detection(sess, detection_graph)
-        
-        # loop through the object detection algorithm for each image
-        
+      
+      # the lane polygon is specific to each camera at a particular point in time
+      # it could change if the camera's perspective is changed
+      # a more robust solution would automatically identify bike lanes
+      # lane points identified with: https://www.image-map.net/
+      lane = np.array(lane_poly)
+      pathbikelane = mpltPath.Path(lane)
+  
+      # loop through the object detection algorithm for each image
       if n == 'all':  
         # used this path join in the for loop to get both the 'blocked' and 'notblocked' folders
         for image_path in [os.path.join(path, name) for path, subdirs, files in os.walk(path_images_dir) for name in files]:
@@ -330,22 +334,12 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
           
           num_cars_in_bikelane_01, num_cars_in_bikelane_015, num_cars_in_bikelane_02, num_cars_in_bikelane_025, num_cars_in_bikelane_03, num_cars_in_bikelane_035, num_cars_in_bikelane_04, num_cars_in_bikelane_045, num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, num_bikes_in_bike_lane = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0        
   
-          # the lane polygon is specific to each camera at a particular point in time
-          # it could change if the camera's perspective is changed
-          # a more robust solution would automatically identify bike lanes
-          # lane points identified with: https://www.image-map.net/
-          lane = np.array(lane_poly)
-          pathbikelane = mpltPath.Path(lane)
-  
     # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
     #      writer = Writer(image_path, width, height)
   
           analyze_boxes(category_index, boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
-          num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
-          num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
-          num_cars_in_bikelane_04, num_cars_in_bikelane_045,
-          num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, 
-          num_bikes_in_bike_lane)
+          num_cars_in_bikelane_02, num_cars_in_bikelane_025, num_cars_in_bikelane_03, num_cars_in_bikelane_035, num_cars_in_bikelane_04, num_cars_in_bikelane_045,
+          num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, num_bikes_in_bike_lane)
       else:  
         # used this path join in the for loop to get both the 'blocked' and 'notblocked' folders
         for image_path in [os.path.join(path, name) for path, subdirs, files in os.walk(path_images_dir) for name in files[:n]]:
@@ -355,38 +349,22 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
           
           num_cars_in_bikelane_01, num_cars_in_bikelane_015, num_cars_in_bikelane_02, num_cars_in_bikelane_025, num_cars_in_bikelane_03, num_cars_in_bikelane_035, num_cars_in_bikelane_04, num_cars_in_bikelane_045, num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, num_bikes_in_bike_lane = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0        
   
-          # the lane polygon is specific to each camera at a particular point in time
-          # it could change if the camera's perspective is changed
-          # a more robust solution would automatically identify bike lanes
-          # lane points identified with: https://www.image-map.net/
-          lane = np.array(lane_poly)
-          pathbikelane = mpltPath.Path(lane)
-  
     # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
     #      writer = Writer(image_path, width, height)
   
           analyze_boxes(category_index, boxes, scores, classes, lane_poly, pathbikelane, f, threshold, timestamp, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
-          num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
-          num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
-          num_cars_in_bikelane_04, num_cars_in_bikelane_045,
-          num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, 
-          num_bikes_in_bike_lane)
+          num_cars_in_bikelane_02, num_cars_in_bikelane_025, num_cars_in_bikelane_03, num_cars_in_bikelane_035, num_cars_in_bikelane_04, num_cars_in_bikelane_045,
+          num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, num_bikes_in_bike_lane)
 
           #print("Process Time " + str(time.time() - start_time))
           #scipy.misc.imsave('object_detection/output_imgs/' + os.path.split(image_path)[1], image_np) # save csv to a different directory than annotated images
         
   f.close()
-  print('successfully run')
-  print(datetime.datetime.now())
+  print('successfully run at ' + datetime.datetime.now())
   return csv_file
-
-"""# download data, set up the model, and then run the model on a dataset"""
-
-#download_data()
 
 # set up the model
 #detection_graph, label_map, categories, category_index = set_up_model('ssd_mobilenet_v1_fpn_shared_box_predictor_640x640_coco14_sync_2018_07_03')
-
 
 def visualize_boxes(image_path, detection_graph, threshold, lane_poly):
 
@@ -444,7 +422,6 @@ def filter_data(pattern):
   pattern = 'cam' + str(pattern)
   pattern = '*' + pattern + '*'
   
-  print('filtering the data')
   blocked = fnmatch.filter(os.listdir('object_detection/input_imgs/blocked'), pattern)
   notblocked = fnmatch.filter(os.listdir('object_detection/input_imgs/notblocked'), pattern)
 
@@ -565,17 +542,17 @@ def analyze_image_yolo(net, image_path, path_images_dir, lane_poly, threshold):
   classes, scores, boxes = net(x)
   
 
-#  ax = utils.viz.plot_bbox(img, boxes[0], scores[0],
-#                           classes[0], thresh = threshold, class_names=net.classes)
-#  
-#  lane = np.array(lane_poly, np.int32)
-#  lane = lane * width_ratio
-#
-#  patch = patches.Polygon(lane, alpha = 0.4)
-#  
-#  ax.add_patch(patch)
-#  
-#  plt.savefig('object_detection/output_imgs/' + os.path.split(image_path)[1])
+  ax = utils.viz.plot_bbox(img, boxes[0], scores[0],
+                           classes[0], thresh = threshold, class_names=net.classes)
+  
+  lane = np.array(lane_poly, np.int32)
+  lane = lane * width_ratio
+
+  patch = patches.Polygon(lane, alpha = 0.4)
+  
+  ax.add_patch(patch)
+  
+  plt.savefig('object_detection/output_imgs/' + os.path.split(image_path)[1])
 
   
   return timestamp, img_name, img_labels, boxes, scores, classes, width_transform, height_transform
