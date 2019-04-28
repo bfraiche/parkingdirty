@@ -211,7 +211,7 @@ def analyze_boxes(category_index, boxes, scores, classes, lane_poly, pathbikelan
 
               ymin, xmin, ymax, xmax = box
               
-              print(lane_poly)
+            #  print(lane_poly)
               # the box is given as a fraction of the distance in each dimension of the image
               # so we have to multiple it by the image dimensions to get the center of each box, relative to the rest of the image
               points, overlap = process_polygons(box, lane_poly)
@@ -585,16 +585,18 @@ def analyze_boxes_yolo(category_index, boxes, scores, classes, lane_poly, thresh
   
   boxes = np.squeeze(boxes)
   scores = np.squeeze(scores)
+  classes_int = np.squeeze(classes).astype(np.int32)  
+  print(classes_int)
+
  # print(scores)
   for i in range(boxes.shape[0]):
      if scores[i] > threshold:
         box = tuple(boxes[i].asnumpy().tolist())
         
-        print(lane_poly)
+        #print(lane_poly)
         
         points, overlap = process_polygons(box, lane_poly)
         
-        classes_int = np.squeeze(classes).astype(np.int32)          
 #        print(classes_int)
 #        print(category_index)
 #        
@@ -603,7 +605,7 @@ def analyze_boxes_yolo(category_index, boxes, scores, classes, lane_poly, thresh
          
         pathbikelane = mpltPath.Path(lane_poly)  
 #         #print(class_name)
-        if classes_int in {3, 8, 6, 4, 1}:
+        if classes_int[i] in {3, 8, 6, 4, 1}:
           if overlap >= 0.1:
               num_cars_in_bikelane_01 += 1
           if overlap >= 0.15:
