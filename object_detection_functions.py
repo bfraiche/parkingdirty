@@ -532,7 +532,7 @@ def analyze_image_yolo(net, image_path, path_images_dir, lane_poly, threshold):
   width_ratio = width_transform / width
   height_ratio = height_transform / height
   
-  lane_out  = lane * width_ratio
+  lane_out  = lane_poly * width_ratio
 #  print(width_ratio, height_ratio)
   
  # print(width, width_transform)
