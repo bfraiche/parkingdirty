@@ -643,7 +643,7 @@ def process_polygons(model, box, lane):
     p1 = Polygon([((xmax),(ymax)), ((xmin),(ymax)), ((xmin),(ymin)), ((xmax),(ymin))])
     
     # location of the bike lane
-    p2 = Polygon(float(lane) * 1.777)
+    p2 = Polygon(np.array(lane) * 1.777) # THIS RETURNS AN ERROR
 
   else: 
     center_x = (((xmax * 352) - (xmin * 352)) / 2) + (xmin * 352) # x dimension of image
