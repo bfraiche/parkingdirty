@@ -205,6 +205,9 @@ def analyze_boxes(category_index, boxes, scores, classes, lane_poly, pathbikelan
 
               classes_int = np.squeeze(classes).astype(np.int32)
               
+              print(classes_int)
+              print(category_index)
+
               if classes_int[i] in category_index.keys():
                 class_name = category_index[classes_int[i]]['name']  
 
@@ -257,9 +260,9 @@ def analyze_boxes(category_index, boxes, scores, classes, lane_poly, pathbikelan
                 if pathbikelane.contains_points(points):
                     num_cars_in_bike_lane_contains +=1
               
-#              if class_name == 'bicycle':
-#                if pathbikelane.contains_points(points):
-#                    num_bikes_in_bike_lane += 1    
+              if class_name == 'bicycle':
+                if pathbikelane.contains_points(points):
+                    num_bikes_in_bike_lane += 1    
                     
  
         f.write(timestamp + ',' + 
@@ -610,10 +613,10 @@ def analyze_boxes_yolo(category_index, boxes, scores, classes, lane, threshold, 
         
         points, overlap = process_polygons(box, lane)
         
-     #   classes_int = np.squeeze(classes).astype(np.int32)          
+        classes_int = np.squeeze(classes).astype(np.int32)          
         
-        if classes[i] in category_index.keys():
-          class_name = category_index[classes[i]]['name']  
+        if classes_int[i] in category_index.keys():
+          class_name = category_index[classes_int[i]]['name']  
   
          
         pathbikelane = mpltPath.Path(lane)  
