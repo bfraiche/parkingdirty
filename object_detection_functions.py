@@ -601,7 +601,7 @@ def analyze_boxes_yolo(category_index, boxes, scores, classes, lane_poly, thresh
 #        if classes_int[i] in category_index.keys():
 #          class_name = category_index[classes_int[i]]['name']  
          
-        pathbikelane = mpltPath.Path(lane)  
+        pathbikelane = mpltPath.Path(lane_poly)  
 #         #print(class_name)
         if classes_int in {3, 8, 6, 4, 1}:
           if overlap >= 0.1:
