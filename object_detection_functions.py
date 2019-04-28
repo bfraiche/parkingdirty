@@ -815,7 +815,7 @@ def run_model(model, pattern, threshold, n):
   polygon = get_polygon(pattern)
 
   if model == "yolo":
-    net = set_up_model_yolo('yolo3_darknet53_voc')
+    net, category_index = set_up_model_yolo('yolo3_darknet53_voc')
 
     process_images_yolo(net, 
                  'object_detection/input_imgs_subset_cam' + str(pattern), # path to subdirectory of images
