@@ -611,17 +611,15 @@ def analyze_boxes_yolo(category_index, boxes, scores, classes, lane, threshold, 
         points, overlap = process_polygons(box, lane)
         
         classes_int = np.squeeze(classes).astype(np.int32)          
-        print(classes_int)
-        print(category_index)
-
-        
-        if classes_int[i] in category_index.keys():
-          class_name = category_index[classes_int[i]]['name']  
-  
+#        print(classes_int)
+#        print(category_index)
+#        
+#        if classes_int[i] in category_index.keys():
+#          class_name = category_index[classes_int[i]]['name']  
          
         pathbikelane = mpltPath.Path(lane)  
 #         #print(class_name)
-        if class_name in {'car', 'truck', 'bus', 'motorcycle','train','person'}:
+        if class_int in {3, 8, 6, 4, 7, 1}:
           if overlap >= 0.1:
               num_cars_in_bikelane_01 += 1
           if overlap >= 0.15:
