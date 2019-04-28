@@ -1,13 +1,13 @@
-pip install gluoncv
-pip install mxnet
-
-git clone https://github.com/tensorflow/models.git
-apt-get -qq install libprotobuf-java protobuf-compiler
-protoc ./models/research/object_detection/protos/string_int_label_map.proto --python_out=.
-cp -R models/research/object_detection/ object_detection/
-rm -rf models
-pip install shapely
-pip install pascal-voc-writer
+!pip install gluoncv
+!pip install mxnet
+!
+!git clone https://github.com/tensorflow/models.git
+!apt-get -qq install libprotobuf-java protobuf-compiler
+!protoc ./models/research/object_detection/protos/string_int_label_map.proto --python_out=.
+!cp -R models/research/object_detection/ object_detection/
+!rm -rf models
+!pip install shapely
+!pip install pascal-voc-writer
 
 import numpy as np
 import pandas as pd
