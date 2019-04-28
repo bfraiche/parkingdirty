@@ -558,7 +558,7 @@ def analyze_image_yolo(net, image_path, path_images_dir, lane_poly, threshold):
   return timestamp, img_name, img_labels, boxes, scores, classes, width_transform, height_transform, lane
 
 
-def analyze_boxes_yolo(category_index, boxes, scores, classes, lane_poly, threshold, timestamp, f, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+def analyze_boxes_yolo(model, category_index, boxes, scores, classes, lane_poly, threshold, timestamp, f, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
   num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
   num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
   num_cars_in_bikelane_04, num_cars_in_bikelane_045,
@@ -574,7 +574,7 @@ def analyze_boxes_yolo(category_index, boxes, scores, classes, lane_poly, thresh
         box = tuple(boxes[i].asnumpy().tolist())
         
         print(lane_poly)
-        points, overlap = process_polygons(box, lane_poly)
+        points, overlap = process_polygons(model, box, lane_poly)
         print(overlap)
         
         pathbikelane = mpltPath.Path(lane_poly)  
@@ -625,7 +625,7 @@ def analyze_boxes_yolo(category_index, boxes, scores, classes, lane_poly, thresh
   return f
 
 
-def process_polygons(box, lane):
+def process_polygons(model, box, lane):
   
   ymin, xmin, ymax, xmax = box
   # print(box)  
@@ -699,7 +699,7 @@ def calculate_overlap(points, overlap):
 #           num_bikes_in_bike_lane += 1    
 
 
-def process_images_yolo(trained_model, path_images_dir, save_directory, threshold, n, lane_poly, category_index):
+def process_images_yolo(model, trained_model, path_images_dir, save_directory, threshold, n, lane_poly, category_index):
   
   csv_file = 'object_detection/output_csv/csvfile.csv'
 
@@ -733,7 +733,7 @@ def process_images_yolo(trained_model, path_images_dir, save_directory, threshol
       # lane points identified with: https://www.image-map.net/
       # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
   
-      analyze_boxes_yolo(category_index, boxes, scores, classes, lane, threshold, timestamp, img_labels,num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+      analyze_boxes_yolo(model, category_index, boxes, scores, classes, lane, threshold, timestamp, img_labels,num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
         num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
         num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
         num_cars_in_bikelane_04, num_cars_in_bikelane_045,
@@ -752,7 +752,7 @@ def process_images_yolo(trained_model, path_images_dir, save_directory, threshol
   
  # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
   
-      analyze_boxes_yolo(category_index, boxes, scores, classes, lane, threshold, timestamp, f, img_labels,num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+      analyze_boxes_yolo(model, category_index, boxes, scores, classes, lane, threshold, timestamp, f, img_labels,num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
         num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
         num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
         num_cars_in_bikelane_04, num_cars_in_bikelane_045,
@@ -774,7 +774,9 @@ def run_model(model, pattern, threshold, n):
     print('setting up ' + model)
     net, category_index = set_up_model_yolo('yolo3_darknet53_voc')
     
-    process_images_yolo(net, 
+    process_images_yolo(
+                 model,
+                 net, 
                  'object_detection/input_imgs_subset_cam' + str(pattern), # path to subdirectory of images
                  'object_detection/output_imgs', # where to put output images, if visualization is included
                  threshold,  # threshold for classification
