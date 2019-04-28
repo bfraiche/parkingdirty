@@ -206,9 +206,8 @@ def analyze_boxes(model, category_index, boxes, scores, classes, lane_poly, path
               classes_int = np.squeeze(classes).astype(np.int32)
               
               if classes_int[i] in category_index.keys():
-                class_name = category_index[classes_int[i]]['name']  
-
-
+                class_name = category_index[classes_int[i]]['name']
+                
               ymin, xmin, ymax, xmax = box
               
             #  print(lane_poly)
@@ -656,7 +655,7 @@ def process_polygons(model, box, lane):
     p1 = Polygon([((xmax * 352),(ymax * 288)), ((xmin * 352),(ymax * 288)), ((xmin * 352),(ymin * 288)), ((xmax * 352),(ymin * 288))])
     
     # location of the bike lane
-    p2 = Polygon(lane_poly)
+    p2 = Polygon(lane)
     #print(lane_poly)
     
   # get intersection between object and bike lane
