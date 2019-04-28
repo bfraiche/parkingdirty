@@ -573,7 +573,9 @@ def analyze_boxes_yolo(category_index, boxes, scores, classes, lane_poly, thresh
      if scores[i] > threshold:
         box = tuple(boxes[i].asnumpy().tolist())
         
+        print(lane_poly)
         points, overlap = process_polygons(box, lane_poly)
+        print(overlap)
         
         pathbikelane = mpltPath.Path(lane_poly)  
 
