@@ -603,6 +603,7 @@ def analyze_boxes_yolo(boxes, scores, classes, lane, threshold, timestamp, f, im
   
   boxes = np.squeeze(boxes)
   scores = np.squeeze(scores)
+  print(scores)
   for i in range(boxes.shape[0]):
      if scores[i] > threshold:
         box = tuple(boxes[i].asnumpy().tolist())
