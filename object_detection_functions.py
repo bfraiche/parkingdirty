@@ -503,7 +503,32 @@ def get_polygon(camera):
 def set_up_model_yolo(trained_model):
     net = model_zoo.get_model(trained_model, pretrained=True)
     
-    return net
+    # List of the strings that is used to add correct label for each box.
+    PATH_TO_LABELS = os.path.join('object_detection/data', 'mscoco_label_map.pbtxt')
+  
+    NUM_CLASSES = 90
+  
+    opener = urllib.request.URLopener()
+    opener.retrieve(DOWNLOAD_BASE + MODEL_FILE, MODEL_FILE)
+    tar_file = tarfile.open(MODEL_FILE)
+    for file in tar_file.getmembers():
+      file_name = os.path.basename(file.name)
+      if 'frozen_inference_graph.pb' in file_name:
+        tar_file.extract(file, os.getcwd())
+  
+    detection_graph = tf.Graph()
+    with detection_graph.as_default():
+      od_graph_def = tf.GraphDef()
+      with tf.gfile.GFile(PATH_TO_CKPT, 'rb') as fid:
+        serialized_graph = fid.read()
+        od_graph_def.ParseFromString(serialized_graph)
+        tf.import_graph_def(od_graph_def, name='')
+  
+    label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
+    categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
+    category_index = label_map_util.create_category_index(categories)
+    
+    return net, category_index
 
 def analyze_image_yolo(net, image_path, path_images_dir, lane_poly, threshold):
   
@@ -584,42 +609,42 @@ def analyze_boxes_yolo(boxes, scores, classes, lane, threshold, timestamp, f, im
         
         points, overlap = process_polygons(box, lane)
         
-#         classes_int = np.squeeze(classes).astype(np.int32)
-  
-#         if classes_int[i] in category_index.keys():
-#                             class_name = category_index[classes_int[i]]['name']  
+        classes_int = np.squeeze(classes).astype(np.int32)          
+        
+        if classes_int[i] in category_index.keys():                             
+          class_name = category_index[classes_int[i]]['name']  
   
          
         pathbikelane = mpltPath.Path(lane)  
 #         #print(class_name)
-      #  if class_name in {'car', 'truck', 'bus', 'motorcycle','train','person'}:
-        if overlap >= 0.1:
-            num_cars_in_bikelane_01 += 1
-        if overlap >= 0.15:
-            num_cars_in_bikelane_015 += 1
-        if overlap >= 0.2:
-            num_cars_in_bikelane_02 += 1
-        if overlap >= 0.25:
-            num_cars_in_bikelane_025 += 1
-        if overlap >= 0.3:
-            num_cars_in_bikelane_03 += 1
-        if overlap >= 0.35:
-            num_cars_in_bikelane_035 += 1
-        if overlap >= 0.4:
-            num_cars_in_bikelane_04 += 1
-        if overlap >= 0.45:
-            num_cars_in_bikelane_045 += 1
-        if overlap >= 0.5:
-            num_cars_in_bikelane_05 += 1    
-        if pathbikelane.contains_points(points):
-            num_cars_in_bike_lane_contains +=1
+        if class_name in {'car', 'truck', 'bus', 'motorcycle','train','person'}:
+          if overlap >= 0.1:
+              num_cars_in_bikelane_01 += 1
+          if overlap >= 0.15:
+              num_cars_in_bikelane_015 += 1
+          if overlap >= 0.2:
+              num_cars_in_bikelane_02 += 1
+          if overlap >= 0.25:
+              num_cars_in_bikelane_025 += 1
+          if overlap >= 0.3:
+              num_cars_in_bikelane_03 += 1
+          if overlap >= 0.35:
+              num_cars_in_bikelane_035 += 1
+          if overlap >= 0.4:
+              num_cars_in_bikelane_04 += 1
+          if overlap >= 0.45:
+              num_cars_in_bikelane_045 += 1
+          if overlap >= 0.5:
+              num_cars_in_bikelane_05 += 1    
+          if pathbikelane.contains_points(points):
+              num_cars_in_bike_lane_contains +=1
             
       
 #     if class_name == 'bicycle':
 #       if pathbikelane.contains_points(points):
 #           num_bikes_in_bike_lane += 1    
             
-  print(num_cars_in_bikelane_03)
+ # print(num_cars_in_bikelane_03)
   
   f.write(timestamp + ',' + 
           str(num_cars_in_bikelane_01) + ',' +
