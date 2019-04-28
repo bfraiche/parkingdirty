@@ -555,7 +555,7 @@ def analyze_image_yolo(net, image_path, path_images_dir, lane_poly, threshold):
   plt.savefig('object_detection/output_imgs/' + os.path.split(image_path)[1])
 
   
-  return timestamp, img_name, img_labels, boxes, scores, classes, width_transform, height_transform
+  return timestamp, img_name, img_labels, boxes, scores, classes, width_transform, height_transform, lane
 
 
 def analyze_boxes_yolo(category_index, boxes, scores, classes, lane_poly, threshold, timestamp, f, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
@@ -723,7 +723,7 @@ def process_images_yolo(trained_model, path_images_dir, save_directory, threshol
     # used this path join in the for loop to get both the 'blocked' and 'notblocked' folders
     for image_path in [os.path.join(path, name) for path, subdirs, files in os.walk(path_images_dir) for name in files]:
      
-      timestamp, img_name, img_labels, boxes, scores, classes, width_transform, height_transform = analyze_image_yolo(trained_model, image_path, 'object_detection/input_imgs', lane_poly, threshold)
+      timestamp, img_name, img_labels, boxes, scores, classes, width_transform, height_transform, lane = analyze_image_yolo(trained_model, image_path, 'object_detection/input_imgs', lane_poly, threshold)
   
       # the lane polygon is specific to each camera at a particular point in time
       # it could change if the camera's perspective is changed
@@ -741,7 +741,7 @@ def process_images_yolo(trained_model, path_images_dir, save_directory, threshol
     # used this path join in the for loop to get both the 'blocked' and 'notblocked' folders
     for image_path in [os.path.join(path, name) for path, subdirs, files in os.walk(path_images_dir) for name in files[:n]]:
       #print(image_path)
-      timestamp, img_name, img_labels, boxes, scores, classes, width_transform, height_transform = analyze_image_yolo(trained_model, image_path, 'object_detection/input_imgs', lane_poly, threshold)
+      timestamp, img_name, img_labels, boxes, scores, classes, width_transform, height_transform, lane = analyze_image_yolo(trained_model, image_path, 'object_detection/input_imgs', lane_poly, threshold)
   
       # the lane polygon is specific to each camera at a particular point in time
       # it could change if the camera's perspective is changed
