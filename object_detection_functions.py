@@ -531,6 +531,8 @@ def analyze_image_yolo(net, image_path, path_images_dir, lane_poly, threshold):
   
   width_ratio = width_transform / width
   height_ratio = height_transform / height
+  
+  lane_out  = lane * width_ratio
 #  print(width_ratio, height_ratio)
   
  # print(width, width_transform)
@@ -554,7 +556,7 @@ def analyze_image_yolo(net, image_path, path_images_dir, lane_poly, threshold):
   plt.savefig('object_detection/output_imgs/' + os.path.split(image_path)[1])
 
   
-  return timestamp, img_name, img_labels, boxes, scores, classes, width_transform, height_transform, lane
+  return timestamp, img_name, img_labels, boxes, scores, classes, width_transform, height_transform, lane_out
 
 
 def analyze_boxes_yolo(model, category_index, boxes, scores, classes, lane_poly, threshold, timestamp, f, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
