@@ -1,3 +1,14 @@
+pip install gluoncv
+pip install mxnet
+
+git clone https://github.com/tensorflow/models.git
+apt-get -qq install libprotobuf-java protobuf-compiler
+protoc ./models/research/object_detection/protos/string_int_label_map.proto --python_out=.
+cp -R models/research/object_detection/ object_detection/
+rm -rf models
+pip install shapely
+pip install pascal-voc-writer
+
 import numpy as np
 import pandas as pd
 import os
@@ -559,21 +570,20 @@ def analyze_image_yolo(net, image_path, path_images_dir, lane_poly, threshold):
   classes, scores, boxes = net(x)
   
 
-  ax = utils.viz.plot_bbox(img, boxes[0], scores[0],
-                           classes[0], thresh = threshold, class_names=net.classes)
-  
-  lane = np.array(lane_poly, np.int32)
-  lane = lane * width_ratio
-
-  patch = patches.Polygon(lane, alpha = 0.4)
-  
-  ax.add_patch(patch)
-  
-  plt.savefig('object_detection/output_imgs/' + os.path.split(image_path)[1])
+#  ax = utils.viz.plot_bbox(img, boxes[0], scores[0],
+#                           classes[0], thresh = threshold, class_names=net.classes)
+#  
+#  lane = np.array(lane_poly, np.int32)
+#  lane = lane * width_ratio
+#
+#  patch = patches.Polygon(lane, alpha = 0.4)
+#  
+#  ax.add_patch(patch)
+#  
+#  plt.savefig('object_detection/output_imgs/' + os.path.split(image_path)[1])
 
   
   return timestamp, img_name, img_labels, boxes, scores, classes, width_transform, height_transform
-
 
 
 def analyze_boxes_yolo(category_index, boxes, scores, classes, lane_poly, threshold, timestamp, f, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
@@ -586,25 +596,15 @@ def analyze_boxes_yolo(category_index, boxes, scores, classes, lane_poly, thresh
   boxes = np.squeeze(boxes)
   scores = np.squeeze(scores)
   classes_int = np.squeeze(classes).astype(np.int32)  
-  print(classes_int)
 
- # print(scores)
   for i in range(boxes.shape[0]):
      if scores[i] > threshold:
         box = tuple(boxes[i].asnumpy().tolist())
         
-        #print(lane_poly)
-        
         points, overlap = process_polygons(box, lane_poly)
         
-#        print(classes_int)
-#        print(category_index)
-#        
-#        if classes_int[i] in category_index.keys():
-#          class_name = category_index[classes_int[i]]['name']  
-         
         pathbikelane = mpltPath.Path(lane_poly)  
-#         #print(class_name)
+
         if classes_int[i] in {3, 8, 6, 4, 1}:
           if overlap >= 0.1:
               num_cars_in_bikelane_01 += 1
@@ -625,8 +625,7 @@ def analyze_boxes_yolo(category_index, boxes, scores, classes, lane_poly, thresh
           if overlap >= 0.5:
               num_cars_in_bikelane_05 += 1    
           if pathbikelane.contains_points(points):
-              num_cars_in_bike_lane_contains +=1
-            
+              num_cars_in_bike_lane_contains +=1  
       
 #     if class_name == 'bicycle':
 #       if pathbikelane.contains_points(points):
@@ -672,7 +671,7 @@ def process_polygons(box, lane):
     
     # location of the bike lane
     p2 = Polygon(lane * 1.777)
-    #  print(p2)
+
   else: 
     center_x = (((xmax * 352) - (xmin * 352)) / 2) + (xmin * 352) # x dimension of image
     center_y = (((ymax * 288) - (ymin * 288)) / 2) + (ymin * 288) # y dimension of image
@@ -785,11 +784,7 @@ def process_images_yolo(trained_model, path_images_dir, save_directory, threshol
         num_cars_in_bikelane_04, num_cars_in_bikelane_045,
         num_cars_in_bikelane_05, num_cars_in_bike_lane_contains, 
         num_bikes_in_bike_lane) 
-    
 
-      #print("Process Time " + str(time.time() - start_time))
-      #scipy.misc.imsave('object_detection/output_imgs/' + os.path.split(image_path)[1], image_np) # save csv to a different directory than annotated images
-    
   f.close()
   print('successfully run')
   print(datetime.datetime.now())
