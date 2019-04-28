@@ -210,29 +210,11 @@ def analyze_boxes(category_index, boxes, scores, classes, lane_poly, pathbikelan
 
 
               ymin, xmin, ymax, xmax = box
-
+              
+              print(lane_poly)
               # the box is given as a fraction of the distance in each dimension of the image
               # so we have to multiple it by the image dimensions to get the center of each box, relative to the rest of the image
-              center_x = (((xmax * 352) - (xmin * 352)) / 2) + (xmin * 352) # x dimension of image
-              center_y = (((ymax * 288) - (ymin * 288)) / 2) + (ymin * 288) # y dimension of image
-              points = [(center_x, center_y)]
-              
-              # area of the object
-              obj_area =  ((xmax * 352) - (xmin * 352)) * ((ymax * 288) - (ymin * 288))
-              
-              # get the absolute position of the object in the image
-              p1 = Polygon([((xmax * 352),(ymax * 288)), ((xmin * 352),(ymax * 288)), ((xmin * 352),(ymin * 288)), ((xmax * 352),(ymin * 288))])
-              
-              # location of the bike lane
-              p2 = Polygon(lane_poly)
-              #print(lane_poly)
-              
-              # get intersection between object and bike lane
-              p3 = p1.intersection(p2)
-              
-              # get ratio of overlap to total object area
-              overlap = p3.area / obj_area
-              
+              points, overlap = process_polygons(box, lane_poly)
 
               #print(class_name)
               if class_name in {'car', 'truck', 'bus', 'motorcycle','person'}:
@@ -594,7 +576,7 @@ def analyze_image_yolo(net, image_path, path_images_dir, lane_poly, threshold):
 
 
 
-def analyze_boxes_yolo(category_index, boxes, scores, classes, lane, threshold, timestamp, f, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+def analyze_boxes_yolo(category_index, boxes, scores, classes, lane_poly, threshold, timestamp, f, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
   num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
   num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
   num_cars_in_bikelane_04, num_cars_in_bikelane_045,
@@ -608,7 +590,9 @@ def analyze_boxes_yolo(category_index, boxes, scores, classes, lane, threshold, 
      if scores[i] > threshold:
         box = tuple(boxes[i].asnumpy().tolist())
         
-        points, overlap = process_polygons(box, lane)
+        print(lane_poly)
+        
+        points, overlap = process_polygons(box, lane_poly)
         
         classes_int = np.squeeze(classes).astype(np.int32)          
 #        print(classes_int)
