@@ -313,7 +313,6 @@ def process_images(detection_graph, path_images_dir, save_directory, threshold, 
   
   print("lane polygon: " + str(lane_poly))
   
-  
   with detection_graph.as_default():
     with tf.Session(graph=detection_graph) as sess:
       
@@ -444,6 +443,8 @@ def visualize_boxes(image_path, detection_graph, threshold, lane_poly):
 def filter_data(pattern):
   pattern = 'cam' + str(pattern)
   pattern = '*' + pattern + '*'
+  
+  print('filtering the data')
   blocked = fnmatch.filter(os.listdir('object_detection/input_imgs/blocked'), pattern)
   notblocked = fnmatch.filter(os.listdir('object_detection/input_imgs/notblocked'), pattern)
 
@@ -458,6 +459,8 @@ def subset_data(pattern):
   #  shutil.rmtree('object_detection/input_imgs_subset')
     os.makedirs(pattern_path + '/blocked')
     os.makedirs(pattern_path + '/notblocked')
+    
+  print('subsetting the data')
   
   for f in filter_data(pattern)[0]:
       shutil.copy('object_detection/input_imgs/blocked/' + f, pattern_path + '/blocked')
@@ -466,6 +469,8 @@ def subset_data(pattern):
       
       
 def get_polygon(camera):
+  
+  print('getting the polygon for this bike lane')
   
   d = {'camera': ['cam31', 'cam135','cam68'],
      'polygon': [[(202,144),(213,145),(351,221),(350,240)],
@@ -483,6 +488,7 @@ def get_polygon(camera):
 
 
 def set_up_model_yolo(trained_model):
+    
     net = model_zoo.get_model(trained_model, pretrained=True)
     
     # List of the strings that is used to add correct label for each box.
@@ -786,8 +792,9 @@ def run_model(model, pattern, threshold, n):
   polygon = get_polygon(pattern)
 
   if model == "yolo":
+    print('setting up ' + model)
     net, category_index = set_up_model_yolo('yolo3_darknet53_voc')
-
+    
     process_images_yolo(net, 
                  'object_detection/input_imgs_subset_cam' + str(pattern), # path to subdirectory of images
                  'object_detection/output_imgs', # where to put output images, if visualization is included
@@ -796,11 +803,13 @@ def run_model(model, pattern, threshold, n):
                  polygon,
                  category_index)
   else:
+    print('setting up ' + model)
     detection_graph, label_map, categories, category_index = set_up_model(model)
 
     ## run the detection and classification processing
     ## args: detection_graph from set_up_model(), the input dir, output dir, threshold for obstacle detection, and number of images to process
     ## get lane polygon from https://www.image-map.net/
+    
     process_images(detection_graph, 
                    'object_detection/input_imgs_subset_cam' + str(pattern), # path to subdirectory of images
                    'object_detection/output_imgs', # where to put output images, if visualization is included
