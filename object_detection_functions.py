@@ -594,7 +594,7 @@ def analyze_image_yolo(net, image_path, path_images_dir, lane_poly, threshold):
 
 
 
-def analyze_boxes_yolo(boxes, scores, classes, lane, threshold, timestamp, f, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+def analyze_boxes_yolo(category_index, boxes, scores, classes, lane, threshold, timestamp, f, img_labels, num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
   num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
   num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
   num_cars_in_bikelane_04, num_cars_in_bikelane_045,
@@ -773,7 +773,7 @@ def process_images_yolo(trained_model, path_images_dir, save_directory, threshol
       # lane points identified with: https://www.image-map.net/
       # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
   
-      analyze_boxes_yolo(boxes, scores, classes, lane, threshold, timestamp, img_labels,num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+      analyze_boxes_yolo(category_index, boxes, scores, classes, lane, threshold, timestamp, img_labels,num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
         num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
         num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
         num_cars_in_bikelane_04, num_cars_in_bikelane_045,
@@ -792,7 +792,7 @@ def process_images_yolo(trained_model, path_images_dir, save_directory, threshol
   
  # analyzing the detected objects for which are in the bikelane and converting into a tabular format 
   
-      analyze_boxes_yolo(boxes, scores, classes, lane, threshold, timestamp, f, img_labels,num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
+      analyze_boxes_yolo(category_index, boxes, scores, classes, lane, threshold, timestamp, f, img_labels,num_cars_in_bikelane_01, num_cars_in_bikelane_015, 
         num_cars_in_bikelane_02, num_cars_in_bikelane_025, 
         num_cars_in_bikelane_03, num_cars_in_bikelane_035, 
         num_cars_in_bikelane_04, num_cars_in_bikelane_045,
