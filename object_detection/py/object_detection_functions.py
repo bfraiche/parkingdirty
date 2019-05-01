@@ -165,7 +165,7 @@ def analyze_image(image_path, path_images_dir, sess, image_tensor, detection_box
       image = Image.open(image_path)
       image_np = load_image_into_numpy_array(image)
   except IOError:
-    print("Issue opening "+image_path)
+    print("Issue opening "+ image_path)
     
     
   width, height = image.size
@@ -267,7 +267,7 @@ def analyze_boxes(model, category_index, boxes, scores, classes, lane_poly, path
 def get_optimal_threshold(file):
 
   command = 'Rscript'
-  path2script = 'parkingdirty/analyze_output.R'
+  path2script = 'parkingdirty/object_detection/R/analyze_output.R'
 
   args = [file]
   cmd = [command, path2script] + args
@@ -279,7 +279,7 @@ def get_optimal_threshold(file):
 def get_misclassification(file, n):
 
   command = 'Rscript'
-  path2script = 'parkingdirty/get_misclassification.R'
+  path2script = 'parkingdirty/object_detection/R/get_misclassification.R'
 
   args = [file, n]
   cmd = [command, path2script] + args
@@ -290,7 +290,7 @@ def get_misclassification(file, n):
 def plot_classification_by_hour(file):
 
   command = 'Rscript'
-  path2script = 'parkingdirty/mis_classification_by_time.R'
+  path2script = 'parkingdirty/object_detection/R/mis_classification_by_time.R'
 
   args = [file]
   cmd = [command, path2script] + args
@@ -507,7 +507,7 @@ def analyze_image_yolo(net, image_path, path_images_dir, lane_poly, threshold):
       image = Image.open(image_path)
       image_np = load_image_into_numpy_array(image)
   except IOError:
-    print("Issue opening "+image_path)
+    print("Issue opening "+ image_path)
     
     
   width, height = image.size
@@ -531,11 +531,6 @@ def analyze_image_yolo(net, image_path, path_images_dir, lane_poly, threshold):
   
   width_ratio = width_transform / width
   height_ratio = height_transform / height
-  
-#  print(width_ratio, height_ratio)
-  
- # print(width, width_transform)
- # print(height, height_transform)
   
   # DETECTION ------------------------------------------------------------------
   
@@ -664,7 +659,7 @@ def process_polygons(model, box, lane):
   p3 = p1.intersection(p2)
   # get ratio of overlap to total object area
   overlap = p3.area / obj_area  
-  print(overlap)
+ # print(overlap)
 
   return points, overlap # the two values needed to access overlap
 
@@ -760,8 +755,7 @@ def process_images_yolo(model, trained_model, path_images_dir, save_directory, t
         num_bikes_in_bike_lane) 
 
   f.close()
-  print('successfully run')
-  print(datetime.datetime.now())
+  print('successfully run, completed at ' + str(datetime.datetime.now()))
   return csv_file
   
   
@@ -771,7 +765,7 @@ def run_model(model, pattern, threshold, n):
   polygon = get_polygon(pattern)
 
   if model == "yolo":
-    print('setting up ' + model)
+    print('setting up: ' + model)
     net, category_index = set_up_model_yolo('yolo3_darknet53_voc')
     
     process_images_yolo(
@@ -784,7 +778,7 @@ def run_model(model, pattern, threshold, n):
                  polygon,
                  category_index)
   else:
-    print('setting up ' + model)
+    print('setting up: ' + model)
     detection_graph, label_map, categories, category_index = set_up_model(model)
 
     ## run the detection and classification processing
@@ -800,4 +794,3 @@ def run_model(model, pattern, threshold, n):
                    category_index)
     
     print('done')
-
