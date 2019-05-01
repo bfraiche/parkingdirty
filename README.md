@@ -1,5 +1,3 @@
-[![Run on FloydHub](https://static.floydhub.com/button/button-small.svg)](https://floydhub.com/run)
-
 # Using computer vision to detect if bike lanes are blocked
 
 Hi! If you understand deep learning and would like to collaborate, feel free to jump over to my the [working notebook](https://github.com/bfraiche/parkingdirty/blob/master/parking_dirty.ipynb)
